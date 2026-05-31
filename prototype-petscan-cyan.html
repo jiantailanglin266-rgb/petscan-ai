@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>PETSCAN AI — Scan Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  /* ── Base ── */
+  --bg-base:#05060A; --bg-deep:#0B1020;
+  --surface-1:#121A2E; --surface-2:#1A2540;
+  --surface-glass:rgba(26,37,64,.55);
+  --border-subtle:rgba(39,225,255,.15);
+  /* ── Neon ── */
+  --neon-cyan:#27E1FF; --neon-green:#36F1B3; --neon-violet:#7B6CFF;
+  --neon-amber:#FFC857; --neon-red:#FF4D6D;
+  /* ── Text ── */
+  --text-hi:#EAF6FF; --text-mid:#9FB2C9; --text-low:#5E708A;
+  /* ── FX ── */
+  --glow-cyan:0 0 24px rgba(39,225,255,.55), 0 0 64px rgba(39,225,255,.25);
+  --glow-green:0 0 24px rgba(54,241,179,.55), 0 0 64px rgba(54,241,179,.22);
+  --shadow-card:0 8px 40px rgba(0,0,0,.45);
+  --grad-bg:radial-gradient(120% 80% at 50% 0%, #0B1020 0%, #05060A 70%);
+  --grad-cta:linear-gradient(135deg, #27E1FF 0%, #7B6CFF 100%);
+  --radius-sm:12px; --radius-md:20px; --radius-lg:28px; --radius-pill:999px;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"Noto Sans JP",system-ui,sans-serif;
+  background:var(--grad-bg); color:var(--text-hi);
+  overflow:hidden; display:flex; justify-content:center; align-items:center;
+}
+.label{font-family:"Space Grotesk",sans-serif; letter-spacing:.16em; text-transform:uppercase; font-size:12px; color:var(--text-mid)}
+.mono{font-family:"Orbitron",sans-serif}
+
+/* ── App frame (phone) ── */
+#app{
+  position:relative; width:100%; max-width:430px; height:100dvh; max-height:932px;
+  overflow:hidden; background:var(--grad-bg);
+}
+/* drifting particles bg */
+#app::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(rgba(39,225,255,.10) 1px, transparent 1px);
+  background-size:34px 34px; opacity:.5; animation:drift 24s linear infinite;
+}
+@keyframes drift{to{background-position:0 -340px}}
+
+.screen{position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .5s ease}
+.screen.active{opacity:1; pointer-events:auto}
+
+/* ════════ HOME ════════ */
+#home{padding:28px 22px; justify-content:space-between}
+.brand{display:flex; align-items:center; gap:10px; justify-content:center; margin-top:8px}
+.brand .ring{width:22px; height:22px; border-radius:50%; border:2px solid var(--neon-cyan); position:relative; box-shadow:var(--glow-cyan)}
+.brand .ring::after{content:""; position:absolute; left:50%; top:1px; width:1px; height:9px; background:var(--neon-cyan); transform-origin:bottom; animation:radar 2.4s linear infinite}
+@keyframes radar{to{transform:rotate(360deg)}}
+.brand b{font-family:"Orbitron",sans-serif; letter-spacing:.14em; font-size:15px}
+.brand b span{color:var(--neon-cyan)}
+
+.hero{position:relative; border-radius:var(--radius-lg); overflow:hidden; flex:1; margin:18px 0; box-shadow:var(--shadow-card); border:1px solid var(--border-subtle)}
+.hero img{width:100%; height:100%; object-fit:cover; display:block}
+.hero .fallback{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:120px; background:linear-gradient(160deg,#16223f,#0a0f1e)}
+.hero .cap{position:absolute; left:0; right:0; bottom:0; padding:40px 18px 16px; background:linear-gradient(transparent,rgba(5,6,10,.85)); font-weight:700; font-size:18px}
+
+.scan-wrap{display:flex; flex-direction:column; align-items:center; gap:18px; padding-bottom:6px}
+.scanbtn{
+  position:relative; width:188px; height:188px; border-radius:50%; border:none; cursor:pointer;
+  background:var(--grad-cta); color:#04121a; font-family:"Orbitron",sans-serif; font-weight:900;
+  letter-spacing:.12em; font-size:19px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  box-shadow:0 0 0 0 rgba(39,225,255,.5); animation:pulse 2.4s ease-out infinite; transition:transform .12s;
+}
+.scanbtn small{font-family:"Space Grotesk"; font-weight:500; font-size:10px; letter-spacing:.2em; opacity:.7}
+.scanbtn:active{transform:scale(.95)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(39,225,255,.45), var(--glow-cyan)} 70%{box-shadow:0 0 0 26px rgba(39,225,255,0), var(--glow-cyan)} 100%{box-shadow:0 0 0 0 rgba(39,225,255,0), var(--glow-cyan)}}
+.scanbtn::before{content:""; position:absolute; inset:8px; border-radius:50%; border:1px solid rgba(4,18,26,.35)}
+
+.statbar{display:flex; gap:10px; width:100%}
+.stat{flex:1; background:var(--surface-glass); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 14px; display:flex; align-items:center; justify-content:space-between}
+.stat .v{font-family:"Orbitron"; font-size:22px; color:var(--neon-green)}
+.stat .v.cyan{color:var(--neon-cyan)}
+
+/* ════════ SCAN OVERLAY ════════ */
+#scan{background:var(--bg-base); align-items:center; justify-content:center}
+.stage{position:relative; width:360px; height:360px; max-width:96vw; display:flex; align-items:center; justify-content:center}
+.subject{position:relative; width:240px; height:240px; border-radius:24px; overflow:hidden; opacity:0; transform:scale(1.25); transition:transform .6s ease, opacity .6s ease}
+.subject img{width:100%; height:100%; object-fit:cover}
+.subject .fb{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:110px; background:linear-gradient(160deg,#16223f,#0a0f1e)}
+.subject.in{opacity:1; transform:scale(1)}
+.subject .edge{position:absolute; inset:0; box-shadow:inset 0 0 0 1px rgba(39,225,255,0); transition:box-shadow .4s}
+.subject.trace .edge{box-shadow:inset 0 0 0 1.5px rgba(39,225,255,.8), inset 0 0 30px rgba(39,225,255,.25)}
+/* scan beam */
+.beam{position:absolute; left:-5%; width:110%; height:3px; top:0; opacity:0;
+  background:linear-gradient(90deg,transparent,var(--neon-cyan) 50%,transparent);
+  box-shadow:0 0 18px 4px rgba(39,225,255,.7); mix-blend-mode:screen}
+.beam.run{opacity:1; animation:sweep 1.6s ease-in-out}
+/* 残像トレイル:本体ビームを少し遅れて追う薄いゴースト */
+.beam.ghost{opacity:0; filter:blur(1.5px); height:6px}
+.beam.ghost.run{animation:sweep 1.6s ease-in-out}
+.beam.g1.run{opacity:.45; animation-delay:.06s}
+.beam.g2.run{opacity:.22; animation-delay:.12s; filter:blur(3px); height:9px}
+.beam.g3.run{opacity:.10; animation-delay:.18s; filter:blur(5px); height:14px}
+@keyframes sweep{0%{top:0}50%{top:236px}100%{top:0}}
+/* grid reveal */
+.grid{position:absolute; inset:0; opacity:0; background-image:linear-gradient(rgba(39,225,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(39,225,255,.25) 1px,transparent 1px); background-size:18px 18px; mix-blend-mode:screen}
+.grid.show{animation:gridflash 1.6s ease-in-out}
+@keyframes gridflash{0%,100%{opacity:0}50%{opacity:.7}}
+
+/* analysis ring */
+.ana-ring{position:absolute; width:340px; height:340px; opacity:0; transition:opacity .4s}
+.ana-ring.show{opacity:1}
+.ana-ring i{position:absolute; inset:0; border-radius:50%; border:1px dashed rgba(123,108,255,.5); animation:spin 6s linear infinite}
+.ana-ring i:nth-child(2){inset:22px; border-style:solid; border-color:rgba(39,225,255,.25); animation-duration:9s; animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* metric nodes — placed in the stage margin, never overlapping the subject */
+.node{position:absolute; width:64px; opacity:0; transform:scale(.5); transition:all .4s cubic-bezier(.2,1.4,.4,1); text-align:center; z-index:3}
+.node.pop{opacity:1; transform:scale(1)}
+.node.top{top:4px; left:50%; margin-left:-32px}
+.node.left{top:50%; left:-6px; margin-top:-22px}
+.node.right{top:50%; right:-6px; margin-top:-22px}
+.node .dot{width:12px; height:12px; border-radius:50%; background:var(--neon-cyan); box-shadow:var(--glow-cyan); margin:0 auto 6px}
+.node .nm{font-family:"Space Grotesk"; font-size:9px; letter-spacing:.14em; color:var(--text-mid)}
+.node .nv{font-family:"Orbitron"; font-size:14px; color:var(--neon-cyan)}
+
+/* phase text */
+.phase-text{position:absolute; bottom:90px; left:0; right:0; text-align:center}
+.phase-text .pt{font-family:"Orbitron"; font-size:18px; letter-spacing:.18em; color:var(--neon-cyan); min-height:24px; text-shadow:var(--glow-cyan)}
+.progressbar{width:200px; height:4px; border-radius:4px; background:rgba(255,255,255,.08); margin:14px auto 0; overflow:hidden}
+.progressbar i{display:block; height:100%; width:0; background:var(--grad-cta); box-shadow:var(--glow-cyan)}
+.progresslabel{font-family:"Space Grotesk"; font-size:11px; letter-spacing:.2em; color:var(--text-low); margin-top:8px}
+
+/* crystallized score */
+.crystal{position:absolute; opacity:0; transform:scale(.4); transition:all .5s cubic-bezier(.2,1.5,.4,1); font-family:"Orbitron"; font-weight:900; font-size:96px; color:var(--neon-green); text-shadow:var(--glow-green)}
+.crystal.show{opacity:1; transform:scale(1)}
+
+/* ════════ RESULT ════════ */
+#result{padding:24px 20px; overflow-y:auto; gap:18px; background:var(--grad-bg)}
+#result.active{animation:slideup .6s ease}
+@keyframes slideup{from{transform:translateY(30px); opacity:0}to{transform:translateY(0); opacity:1}}
+.r-head{text-align:center; padding-top:6px}
+.gauge{position:relative; width:200px; height:200px; margin:6px auto 2px}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+.gauge .score{font-family:"Orbitron"; font-weight:900; font-size:62px; color:var(--neon-green); line-height:1; text-shadow:var(--glow-green)}
+.gauge .grade{font-family:"Orbitron"; font-weight:700; font-size:20px; color:var(--neon-green); margin-top:2px}
+.cond{font-family:"Space Grotesk"; letter-spacing:.18em; font-size:13px; color:var(--neon-green); text-transform:uppercase; text-align:center}
+
+.agecard{display:flex; align-items:center; justify-content:center; gap:14px; background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.agecard .blk{text-align:center}
+.agecard .blk .t{font-size:11px; color:var(--text-mid)}
+.agecard .blk .n{font-family:"Orbitron"; font-size:22px}
+.agecard .arrow{color:var(--neon-cyan); font-size:20px}
+.agecard .blk .n.green{color:var(--neon-green)}
+
+.sec-title{font-family:"Space Grotesk"; letter-spacing:.16em; font-size:11px; color:var(--text-low); text-transform:uppercase; margin:2px 0}
+.metric{display:flex; align-items:center; gap:12px; background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px}
+.metric .ic{font-size:22px; width:34px; text-align:center}
+.metric .body{flex:1}
+.metric .body .mt{font-family:"Space Grotesk"; font-size:12px; letter-spacing:.1em; color:var(--text-mid)}
+.metric .body .ms{font-size:11px; color:var(--text-low); margin-top:2px}
+.metric .sc{font-family:"Orbitron"; font-size:24px}
+.metric .lv{font-size:10px; letter-spacing:.12em; padding:3px 8px; border-radius:var(--radius-pill); font-family:"Space Grotesk"}
+.lv.good{color:var(--neon-green); background:rgba(54,241,179,.12)}
+.lv.watch{color:var(--neon-amber); background:rgba(255,200,87,.12)}
+.lv.attention{color:var(--neon-red); background:rgba(255,77,109,.12)}
+
+/* dynamic-theme transitions on result */
+.gauge .score, .gauge .grade, .cond, #gaugeArc{transition:color .5s ease, stroke .5s ease, text-shadow .5s ease}
+
+/* particle burst (result landing) */
+.burst{position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:5}
+.burst .particle{position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%;
+  opacity:1; transition:transform .85s cubic-bezier(.15,.7,.25,1), opacity .85s ease}
+
+.vet{background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.vet .h{font-size:12px; color:var(--neon-violet); margin-bottom:8px; font-weight:700}
+.vet p{font-size:13px; line-height:1.7; color:var(--text-hi)}
+
+.care{border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; background:linear-gradient(135deg,rgba(123,108,255,.10),rgba(39,225,255,.06))}
+.care .t{font-size:12px; color:var(--text-mid)}
+.care .l{font-weight:700; margin-top:4px; display:flex; align-items:center; justify-content:space-between}
+.care .l span{color:var(--neon-cyan)}
+
+.r-actions{display:flex; gap:10px}
+.btn{flex:1; padding:14px; border-radius:var(--radius-pill); border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-hi); font-family:"Noto Sans JP"; font-weight:700; font-size:13px; cursor:pointer}
+.btn.primary{background:var(--grad-cta); color:#04121a; border:none; box-shadow:var(--glow-cyan)}
+.btn:active{transform:scale(.97)}
+
+.disclaimer{font-size:10px; color:var(--text-low); text-align:center; line-height:1.6; padding:4px 8px 20px}
+
+/* sound toggle */
+.sound-toggle{position:absolute; top:16px; right:16px; z-index:20; width:40px; height:40px; border-radius:50%;
+  border:1px solid var(--border-subtle); background:var(--surface-glass); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  color:var(--text-hi); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center}
+.sound-toggle.off{opacity:.55}
+.sound-toggle:active{transform:scale(.92)}
+
+/* ════════ JACKET / SPLASH ════════ */
+#splash{align-items:center; justify-content:center; text-align:center; padding:40px 30px}
+.jacket{display:flex; flex-direction:column; align-items:center; gap:22px}
+.jacket .radar{position:relative; width:168px; height:168px; border-radius:50%;
+  border:2px solid rgba(39,225,255,.45); box-shadow:var(--glow-cyan), inset 0 0 44px rgba(39,225,255,.15)}
+.jacket .radar .sweep{position:absolute; inset:-2px; border-radius:50%; mix-blend-mode:screen;
+  background:conic-gradient(from 0deg, rgba(39,225,255,.5), rgba(39,225,255,0) 90deg); animation:radar 2.6s linear infinite}
+.jacket .radar .glyph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:58px; filter:drop-shadow(0 0 14px rgba(39,225,255,.6))}
+.jacket .pulsering{position:absolute; inset:0; border-radius:50%; border:1px solid rgba(39,225,255,.5); animation:pulseOut 2.8s ease-out infinite}
+.jacket .pulsering.d2{animation-delay:1.4s}
+@keyframes pulseOut{0%{transform:scale(1); opacity:.6}100%{transform:scale(1.85); opacity:0}}
+.jacket .title{font-family:"Orbitron"; font-weight:900; letter-spacing:.14em; font-size:33px; margin-top:6px}
+.jacket .title span{color:var(--neon-cyan); text-shadow:var(--glow-cyan)}
+.jacket .tag{font-size:14px; color:var(--text-mid); letter-spacing:.04em}
+.jacket .sub{font-size:13px; color:var(--text-low); line-height:1.8; margin-top:-6px}
+.cta-lg{margin-top:8px; padding:16px 40px; border-radius:var(--radius-pill); border:none; cursor:pointer;
+  background:var(--grad-cta); color:#04121a; font-family:"Noto Sans JP"; font-weight:700; font-size:16px; box-shadow:var(--glow-cyan);
+  display:inline-flex; align-items:center; gap:10px}
+.cta-lg span{font-family:"Orbitron"}
+.cta-lg:active{transform:scale(.97)}
+.splash-note{font-size:10px; color:var(--text-low); line-height:1.6; margin-top:10px; max-width:280px}
+
+/* ════════ PROFILE / PERSONA ════════ */
+#profile{padding:26px 22px 36px; gap:16px; overflow-y:auto}
+.p-head{display:flex; align-items:center; gap:10px}
+.p-head .back{width:38px; height:38px; flex:0 0 auto; border-radius:50%; border:1px solid var(--border-subtle);
+  background:var(--surface-1); color:var(--text-hi); font-size:22px; line-height:1; cursor:pointer}
+.p-head .back:active{transform:scale(.92)}
+.p-title{font-family:"Noto Sans JP"; font-weight:700; font-size:22px; line-height:1.35}
+.species{display:flex; gap:12px}
+.species .opt{flex:1; padding:18px 10px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);
+  background:var(--surface-1); text-align:center; cursor:pointer; transition:all .2s}
+.species .opt .emoji{font-size:36px}
+.species .opt .lbl{font-size:13px; color:var(--text-mid); margin-top:4px; letter-spacing:.1em}
+.species .opt.sel{border-color:var(--neon-cyan); box-shadow:var(--glow-cyan);
+  background:linear-gradient(135deg,rgba(39,225,255,.14),rgba(123,108,255,.08))}
+.species .opt.sel .lbl{color:var(--neon-cyan)}
+.photo-field{display:flex; align-items:center; gap:14px; cursor:pointer; padding:8px 2px}
+.photo-prev{width:62px; height:62px; flex:0 0 auto; border-radius:16px; border:1px dashed var(--border-subtle);
+  background:var(--surface-1); display:flex; align-items:center; justify-content:center; font-size:26px; color:var(--neon-cyan); overflow:hidden}
+.photo-prev img{width:100%; height:100%; object-fit:cover}
+.photo-txt{font-size:14px; color:var(--text-mid)}
+.photo-txt small{color:var(--text-low); font-size:11px; margin-left:4px}
+.field{display:flex; flex-direction:column; gap:7px}
+.field label{font-size:12px; color:var(--text-mid); letter-spacing:.04em}
+.field input,.field select{background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-sm);
+  padding:13px 14px; color:var(--text-hi); font-family:inherit; font-size:15px; width:100%; -webkit-appearance:none; appearance:none}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--neon-cyan) 50%),linear-gradient(135deg,var(--neon-cyan) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px; background-size:5px 5px,5px 5px; background-repeat:no-repeat}
+.field input:focus,.field select:focus{outline:none; border-color:var(--neon-cyan); box-shadow:0 0 0 2px rgba(39,225,255,.2)}
+.field option{background:#0B1020; color:var(--text-hi)}
+.row{display:flex; gap:12px}
+.row .field{flex:1}
+/* バリデーション */
+.field.err input,.field.err select{border-color:var(--neon-red); box-shadow:0 0 0 2px rgba(255,77,109,.22)}
+.field .errmsg{display:none; color:var(--neon-red); font-size:11px}
+.field.err .errmsg{display:block}
+.field.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ════════ 結果:順次フェードイン ════════ */
+#result.active > *{opacity:0; animation:revealUp .55s ease forwards}
+#result.active > *:nth-child(1){animation-delay:.02s}
+#result.active > *:nth-child(2){animation-delay:.12s}
+#result.active > *:nth-child(3){animation-delay:.22s}
+#result.active > *:nth-child(4){animation-delay:.32s}
+#result.active > *:nth-child(5){animation-delay:.42s}
+#result.active > *:nth-child(6){animation-delay:.52s}
+#result.active > *:nth-child(7){animation-delay:.60s}
+@keyframes revealUp{from{opacity:0; transform:translateY(22px)}to{opacity:1; transform:translateY(0)}}
+
+/* グレードDの警告グロー(穏やかに) */
+.gauge.warn::after{content:""; position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
+  border:1px solid rgba(255,77,109,.55); box-shadow:0 0 24px rgba(255,77,109,.3); animation:warnPulse 1.7s ease-out infinite}
+@keyframes warnPulse{0%{transform:scale(1); opacity:.7}100%{transform:scale(1.14); opacity:0}}
+
+/* ════════ 履歴グラフ ════════ */
+#history{padding:26px 22px; gap:18px; overflow-y:auto}
+.h-head{display:flex; align-items:center; gap:10px}
+.h-head .back{width:38px; height:38px; flex:0 0 auto; border-radius:50%; border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-hi); font-size:22px; cursor:pointer}
+.h-head .back:active{transform:scale(.92)}
+.h-title{font-family:"Noto Sans JP"; font-weight:700; font-size:19px}
+.h-title small{display:block; font-size:11px; color:var(--text-low); letter-spacing:.1em; font-family:"Space Grotesk"}
+.range{display:flex; gap:8px}
+.range button{flex:1; padding:9px; border-radius:var(--radius-pill); border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-mid); font-family:inherit; font-size:13px; cursor:pointer}
+.range button.on{background:var(--grad-cta); color:#04121a; border:none; font-weight:700; box-shadow:var(--glow-cyan)}
+.chart-card{background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px 14px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.chart-card .cur{display:flex; align-items:baseline; gap:8px; padding:0 6px 8px}
+.chart-card .cur b{font-family:"Orbitron"; font-size:30px; color:var(--neon-cyan)}
+.chart-card .cur span{font-size:11px; color:var(--text-low); letter-spacing:.1em}
+.badges{display:flex; gap:10px; flex-wrap:wrap}
+.bdg{display:flex; align-items:center; gap:7px; background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-pill); padding:8px 14px; font-size:12px; color:var(--text-mid)}
+.bdg .m{font-size:16px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <button class="sound-toggle" onclick="toggleSound(this)" aria-label="サウンド切替">🔊</button>
+
+  <!-- ════════ JACKET / SPLASH ════════ -->
+  <section id="splash" class="screen active">
+    <div class="jacket">
+      <div class="radar">
+        <span class="pulsering"></span><span class="pulsering d2"></span>
+        <span class="sweep"></span>
+        <span class="glyph" id="splashGlyph">🐾</span>
+      </div>
+      <div class="title">PETSCAN <span>AI</span></div>
+      <div class="tag">愛を、テクノロジーで可視化する。</div>
+      <div class="sub">スマホで撮るだけ。AIがこの子を<br>スキャンし、健康を可視化する。</div>
+      <button class="cta-lg" onclick="show('profile')">はじめる <span>→</span></button>
+      <div class="splash-note">※本サービスは健康管理のための情報提供です。獣医療・診断ではありません。</div>
+    </div>
+  </section>
+
+  <!-- ════════ PROFILE / PERSONA INPUT ════════ -->
+  <section id="profile" class="screen">
+    <div class="p-head">
+      <button class="back" onclick="show('splash')">‹</button>
+      <div class="p-title">この子のことを<br>教えてください</div>
+    </div>
+
+    <div class="species">
+      <div class="opt sel" data-s="dog" onclick="selectSpecies('dog')"><div class="emoji">🐶</div><div class="lbl">いぬ</div></div>
+      <div class="opt" data-s="cat" onclick="selectSpecies('cat')"><div class="emoji">🐱</div><div class="lbl">ねこ</div></div>
+    </div>
+
+    <label class="photo-field">
+      <span class="photo-prev" id="photoPrev">＋</span>
+      <span class="photo-txt">写真を追加<small>（任意）</small></span>
+      <input type="file" accept="image/*" onchange="onPhoto(this)" hidden />
+    </label>
+
+    <div class="field" id="fldName">
+      <label>なまえ</label>
+      <input id="fName" type="text" placeholder="例：モカ" maxlength="20" />
+      <span class="errmsg">なまえを入力してください</span>
+    </div>
+
+    <div class="row">
+      <div class="field"><label>たんじょうび（年）</label><select id="fYear"></select></div>
+      <div class="field"><label>月</label><select id="fMonth"></select></div>
+    </div>
+
+    <div class="field">
+      <label>犬種・猫種</label>
+      <select id="fBreed"></select>
+    </div>
+
+    <div class="field" id="fldWeight">
+      <label>いまの体重（kg）</label>
+      <input id="fWeight" type="number" step="0.1" min="0" placeholder="例：4.2" inputmode="decimal" />
+      <span class="errmsg">正しい体重を入力してください</span>
+    </div>
+
+    <button class="cta-lg" onclick="submitProfile()">登録してスキャンへ <span>→</span></button>
+  </section>
+
+  <!-- ════════ HOME ════════ -->
+  <section id="home" class="screen">
+    <div class="brand"><i class="ring"></i><b>PETSCAN <span>AI</span></b></div>
+    <div class="hero">
+      <img id="homeImg" src="https://place.dog/600/700" alt="pet" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div class="fallback" id="homeFb" style="display:none">🐕</div>
+      <div class="cap" id="homeCap">モカ の健康を、今日も。</div>
+    </div>
+    <div class="scan-wrap">
+      <button class="scanbtn" onclick="startScan()">SCAN<br>NOW<small>TAP TO SCAN</small></button>
+      <div class="statbar" onclick="showHistory()" style="cursor:pointer">
+        <div class="stat"><span class="label">前回スコア</span><span class="v"><span id="homeLast">92</span> <small style="font-size:12px" id="homeLastGr">A+</small></span></div>
+        <div class="stat"><span class="label">健康推移</span><span class="v cyan">📈 ›</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ SCAN OVERLAY ════════ -->
+  <section id="scan" class="screen">
+    <div class="stage">
+      <div class="ana-ring" id="anaRing"><i></i><i></i></div>
+      <div class="subject" id="subject">
+        <img id="subjImg" src="https://place.dog/400/400" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="fb" id="subjFb" style="display:none">🐕</div>
+        <div class="grid" id="grid"></div>
+        <div class="edge"></div>
+        <div class="beam ghost g3" id="beamG3"></div>
+        <div class="beam ghost g2" id="beamG2"></div>
+        <div class="beam ghost g1" id="beamG1"></div>
+        <div class="beam" id="beam"></div>
+      </div>
+      <!-- metric nodes -->
+      <div class="node top" id="n0"><div class="dot"></div><div class="nm">BODY</div><div class="nv" data-v="94">--</div></div>
+      <div class="node left" id="n1"><div class="dot"></div><div class="nm">TEAR</div><div class="nv" data-v="88">--</div></div>
+      <div class="node right" id="n2"><div class="dot"></div><div class="nm">COAT</div><div class="nv" data-v="78">--</div></div>
+      <div class="crystal" id="crystal">0</div>
+    </div>
+    <div class="phase-text">
+      <div class="pt" id="phaseText"></div>
+      <div class="progressbar"><i id="progFill"></i></div>
+      <div class="progresslabel" id="progLabel">INITIALIZING</div>
+    </div>
+  </section>
+
+  <!-- ════════ RESULT ════════ -->
+  <section id="result" class="screen">
+    <div class="r-head">
+      <div class="gauge">
+        <svg width="200" height="200">
+          <circle cx="100" cy="100" r="88" stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"/>
+          <circle id="gaugeArc" cx="100" cy="100" r="88" stroke="url(#gg)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"/>
+          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop id="gg0" offset="0" stop-color="#27E1FF"/><stop id="gg1" offset="1" stop-color="#36F1B3"/></linearGradient></defs>
+        </svg>
+        <div class="center"><div class="score" id="rScore">0</div><div class="grade" id="rGrade">A+</div></div>
+        <div class="burst" id="burst"></div>
+      </div>
+      <div class="cond" id="rCond">Excellent Condition</div>
+    </div>
+
+    <div class="agecard">
+      <div class="blk"><div class="t">実年齢</div><div class="n" id="rRealAge">7.0歳</div></div>
+      <div class="arrow">→</div>
+      <div class="blk"><div class="t">健康年齢</div><div class="n green" id="rHealthAge">4.2歳 ✨</div></div>
+    </div>
+
+    <div>
+      <div class="sec-title">Scan Results</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div class="metric"><div class="ic">⚖️</div><div class="body"><div class="mt">BODY CONDITION</div><div class="ms">適正体型・肥満リスク</div></div><div class="sc" id="scBody">94</div><div class="lv good" id="lvBody">GOOD</div></div>
+        <div class="metric"><div class="ic">👁️</div><div class="body"><div class="mt">TEAR STAIN</div><div class="ms">涙やけ・目周りの着色</div></div><div class="sc" id="scTear">88</div><div class="lv good" id="lvTear">GOOD</div></div>
+        <div class="metric"><div class="ic">✨</div><div class="body"><div class="mt">COAT CONDITION</div><div class="ms">毛並み・ツヤ</div></div><div class="sc" id="scCoat">78</div><div class="lv watch" id="lvCoat">WATCH</div></div>
+      </div>
+    </div>
+
+    <div class="vet">
+      <div class="h">💬 獣医師監修コメント</div>
+      <p>毛並みは季節で揺らぎがちです。日々のブラッシングと食事の見直しが一般的なケアです。気になる状態が続く場合は獣医師にご相談ください。</p>
+    </div>
+
+    <div class="care">
+      <div class="t">毛並みが気になる時に。</div>
+      <div class="l">わんにゃんエクラ <span>›</span></div>
+    </div>
+
+    <div class="r-actions">
+      <button class="btn" onclick="showHistory()">履歴を見る</button>
+      <button class="btn primary" onclick="startScan()">もう一度スキャン</button>
+    </div>
+    <div class="disclaimer">※本結果は健康管理のための目安です。獣医療・診断ではありません。気になる場合は獣医師にご相談ください。</div>
+  </section>
+
+  <!-- ════════ HISTORY / TREND ════════ -->
+  <section id="history" class="screen">
+    <div class="h-head">
+      <button class="back" onclick="goHome()">‹</button>
+      <div class="h-title" id="hTitle">健康推移 <small>HEALTH TREND</small></div>
+    </div>
+    <div class="range">
+      <button data-r="week" class="on" onclick="setRange('week',this)">週</button>
+      <button data-r="month" onclick="setRange('month',this)">月</button>
+      <button data-r="year" onclick="setRange('year',this)">年</button>
+    </div>
+    <div class="chart-card">
+      <div class="cur"><b id="hCur">92</b><span id="hCurLabel">LATEST HEALTH SCORE</span></div>
+      <svg id="chart" viewBox="0 0 320 180" width="100%" height="180" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="sec-title">獲得バッジ</div>
+    <div class="badges">
+      <div class="bdg"><span class="m">🔥</span>7日連続スキャン</div>
+      <div class="bdg"><span class="m">🏅</span>スコア90超</div>
+      <div class="bdg"><span class="m">⭐</span>ヘルスLv.4</div>
+    </div>
+    <button class="cta-lg" style="align-self:center" onclick="startScan()">スキャンする <span>→</span></button>
+  </section>
+
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const screens = {splash:$('#splash'), profile:$('#profile'), home:$('#home'), scan:$('#scan'), result:$('#result'), history:$('#history')};
+function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); if(screens[name].scrollTo) screens[name].scrollTop=0; }
+function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let scanCount = 0;   // 0回目=フル演出 / 1回目以降=短縮演出
+let current = null;  // 今回のスキャン結果(動的生成)
+
+/* ── グレード別テーマ ── */
+const THEMES = {
+  green:{c:'#36F1B3', c2:'#27E1FF', glow:'0 0 24px rgba(54,241,179,.55), 0 0 64px rgba(54,241,179,.22)', rgb:'54,241,179'},
+  cyan: {c:'#27E1FF', c2:'#36F1B3', glow:'0 0 24px rgba(39,225,255,.55), 0 0 64px rgba(39,225,255,.25)', rgb:'39,225,255'},
+  amber:{c:'#FFC857', c2:'#FFE29A', glow:'0 0 24px rgba(255,200,87,.5), 0 0 60px rgba(255,200,87,.2)',  rgb:'255,200,87'},
+  red:  {c:'#FF4D6D', c2:'#FF8AA0', glow:'0 0 22px rgba(255,77,109,.5), 0 0 56px rgba(255,77,109,.18)',  rgb:'255,77,109'},
+};
+function gradeOf(score){
+  if(score>=90) return {g:'A+', t:THEMES.green, cond:'Excellent Condition'};
+  if(score>=80) return {g:'A',  t:THEMES.cyan,  cond:'Great Condition'};
+  if(score>=70) return {g:'B',  t:THEMES.cyan,  cond:'Good Condition'};
+  if(score>=60) return {g:'C',  t:THEMES.amber, cond:'Fair Condition'};
+  return            {g:'D',  t:THEMES.red,   cond:'Needs Care'};
+}
+// 項目スコア → レベル(badge)
+function metricLevel(s){ return s>=85 ? ['good','GOOD'] : s>=70 ? ['watch','WATCH'] : ['attention','ATTENTION']; }
+const rand = (a,b)=> Math.round(a + Math.random()*(b-a));
+// 各項目スコアと総合スコアを生成
+function rollScores(){
+  const body=rand(64,98), tear=rand(62,96), coat=rand(58,95);
+  const overall=Math.round(body*0.5 + tear*0.25 + coat*0.25);
+  return {body, tear, coat, overall};
+}
+
+function goHome(){ show('home'); }
+
+/* ════════ ペルソナ(プロフィール) ════════ */
+const pet = { species:'dog', name:'モカ', breed:'トイプードル', birthY:2019, birthM:4, weight:4.2, photo:null };
+const BREEDS = {
+  dog:['トイプードル','チワワ','柴犬','ミニチュアダックス','ポメラニアン','フレンチブルドッグ','ゴールデンレトリバー','ミックス','その他'],
+  cat:['スコティッシュフォールド','マンチカン','アメリカンショートヘア','ノルウェージャンフォレスト','ラグドール','ブリティッシュショートヘア','雑種(MIX)','その他']
+};
+const DEMO_IMG = {
+  dog:{ home:'https://place.dog/600/700', scan:'https://place.dog/400/400' },
+  cat:{ home:'https://cataas.com/cat?width=600&height=700', scan:'https://cataas.com/cat?width=440&height=440' }
+};
+function selectSpecies(s){
+  pet.species=s;
+  document.querySelectorAll('.species .opt').forEach(o=>o.classList.toggle('sel', o.dataset.s===s));
+  $('#splashGlyph').textContent = s==='cat' ? '🐈' : '🐾';
+  fillBreeds();
+  if(!pet.photo){ const pv=$('#photoPrev'); pv.textContent = s==='cat'?'🐱':'🐶'; }
+}
+function fillBreeds(){
+  const sel=$('#fBreed'); const keep=sel.value; sel.innerHTML='';
+  BREEDS[pet.species].forEach(b=>{ const o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o); });
+  if([...sel.options].some(o=>o.value===keep)) sel.value=keep;
+}
+function fillYears(){
+  const y=$('#fYear'); const now=new Date().getFullYear();
+  for(let v=now; v>=now-22; v--){ const o=document.createElement('option'); o.value=v; o.textContent=v+'年'; y.appendChild(o); }
+  const m=$('#fMonth'); for(let v=1; v<=12; v++){ const o=document.createElement('option'); o.value=v; o.textContent=v+'月'; m.appendChild(o); }
+}
+function onPhoto(input){
+  const f=input.files && input.files[0]; if(!f) return;
+  pet.photo=URL.createObjectURL(f);
+  const pv=$('#photoPrev'); pv.innerHTML=''; const im=new Image(); im.src=pet.photo; pv.appendChild(im);
+}
+function fieldError(fldId, on){
+  const f=$('#'+fldId); f.classList.toggle('err', on);
+  if(on){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
+}
+function submitProfile(){
+  const name=($('#fName').value||'').trim();
+  const w=parseFloat($('#fWeight').value);
+  let ok=true;
+  if(!name){ fieldError('fldName', true); ok=false; } else fieldError('fldName', false);
+  if(!(w>0 && w<120)){ fieldError('fldWeight', true); ok=false; } else fieldError('fldWeight', false);
+  if(!ok){ buzz([40,60,40]); return; }   // バリデーション失敗
+  pet.name   = name;
+  pet.breed  = $('#fBreed').value;
+  pet.birthY = +$('#fYear').value;
+  pet.birthM = +$('#fMonth').value;
+  pet.weight = w;
+  applyPet();
+  show('home');
+}
+function petAge(){
+  const now=new Date();
+  const age = (now.getFullYear()-pet.birthY) + ((now.getMonth()+1)-pet.birthM)/12;
+  return Math.max(0.1, age);
+}
+function applyPet(){
+  const isCat = pet.species==='cat';
+  const emoji = isCat ? '🐈' : '🐕';
+  const homeSrc = pet.photo || DEMO_IMG[pet.species].home;
+  const scanSrc = pet.photo || DEMO_IMG[pet.species].scan;
+  // home
+  const hi=$('#homeImg'); hi.style.display='block'; hi.src=homeSrc;
+  const hf=$('#homeFb'); hf.style.display='none'; hf.textContent=emoji;
+  $('#homeCap').textContent = pet.name + ' の健康を、今日も。';
+  // scan subject
+  const si=$('#subjImg'); si.style.display='block'; si.src=scanSrc;
+  const sf=$('#subjFb'); sf.style.display='none'; sf.textContent=emoji;
+  // result real age
+  $('#rRealAge').textContent = petAge().toFixed(1) + '歳';
+}
+
+function startScan(){
+  show('scan');
+  se.resume();                       // ユーザー操作直後にAudioContext起動
+  const quick = scanCount > 0;       // 2回目以降は短縮
+  scanCount++;
+  // 今回の結果を動的生成 → グレードでテーマ決定
+  current = rollScores();
+  const theme = gradeOf(current.overall).t;
+  // reset
+  const beams = ['#beam','#beamG1','#beamG2','#beamG3'].map($);
+  const subj=$('#subject'), grid=$('#grid'), ring=$('#anaRing'), crystal=$('#crystal');
+  subj.classList.remove('in','trace'); beams.forEach(b=>b.classList.remove('run')); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show');
+  // ノードの確定値を今回のスコアに
+  $('#n0 .nv').dataset.v=current.body; $('#n1 .nv').dataset.v=current.tear; $('#n2 .nv').dataset.v=current.coat;
+  ['n0','n1','n2'].forEach(id=>{ $('#'+id).classList.remove('pop'); $('#'+id+' .nv').textContent='--'; });
+  // クリスタル(結晶化スコア)をテーマ色に
+  crystal.style.color=theme.c; crystal.style.textShadow=theme.glow;
+  $('#phaseText').textContent=''; $('#progFill').style.width='0%'; $('#progLabel').textContent='INITIALIZING';
+
+  // 速度係数:reduced-motion=0.35 / 短縮=0.6 / フル=1
+  const T = reduce ? 0.35 : (quick ? 0.6 : 1);
+  const step = (fn,ms)=> setTimeout(fn, ms*T);
+
+  // ① 0.0–0.6 起動・吸い込み
+  step(()=>{ subj.classList.add('in'); buzz(20); se.hum(); }, 60);
+
+  // ② 0.6–2.2 走査 SCANNING
+  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beams.forEach(b=>b.classList.add('run')); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(); se.sweep(1500*T); }, 600);
+
+  // ③ 2.2–3.6 解析HUD ANALYZING
+  step(()=>{ $('#phaseText').textContent='ANALYZING…'; $('#progLabel').textContent='AI VISION MODEL'; ring.classList.add('show'); popNode('n0',0); popNode('n1',180); popNode('n2',360); rollNodes(); rampProgress(46,90,1400*T); se.analyze(900*T); }, 2200);
+  step(()=>{ $('#phaseText').textContent='HEALTH INDEX CALCULATED'; }, 3300);
+
+  // ④ 3.6–4.8 ホログラム結晶化
+  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,current.overall,900*T); rampProgress(90,100,600*T); buzz(40); se.complete(); }, 3600);
+
+  // ⑤ 着地 → 結果へ
+  step(()=>{ enterResult(); }, 4900);
+}
+
+function rampProgress(from,to,dur){
+  const fill=$('#progFill'), t0=performance.now();
+  function f(now){ const k=Math.min(1,(now-t0)/dur); const v=from+(to-from)*k; fill.style.width=v+'%'; if(k<1) requestAnimationFrame(f); }
+  requestAnimationFrame(f);
+}
+function popNode(id,delay){ setTimeout(()=>$('#'+id).classList.add('pop'), delay); }
+function rollNodes(){
+  document.querySelectorAll('.node .nv').forEach(el=>{
+    const target=+el.dataset.v; let i=0;
+    const iv=setInterval(()=>{ el.textContent=Math.floor(Math.random()*100); if(++i>14){ clearInterval(iv); el.textContent=target; } }, 70);
+  });
+}
+function countUp(el,from,to,dur){
+  const t0=performance.now();
+  function f(now){ const k=Math.min(1,(now-t0)/dur); el.textContent=Math.round(from+(to-from)*k); if(k<1) requestAnimationFrame(f); }
+  requestAnimationFrame(f);
+}
+function buzzPulse(){ if(!navigator.vibrate) return; navigator.vibrate([15,120,15,120,15]); }
+
+/* ── Sound engine: Web Audio APIで生成(外部ファイル不要) ── */
+const se = (()=>{
+  let ctx=null, on=true;
+  const ac = ()=>{ if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return ctx; };
+  // 単発トーン
+  function tone(freq, t0, dur, type='sine', peak=0.18){
+    const c=ac(); if(!c||!on) return;
+    const o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(peak, t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0+dur+0.02);
+    return o;
+  }
+  return {
+    get on(){ return on; },
+    toggle(){ on=!on; if(on) this.resume(); return on; },
+    resume(){ const c=ac(); if(c&&c.state==='suspended') c.resume(); },
+    // ① 起動ハム:低音の立ち上がり
+    hum(){ const c=ac(); if(!c||!on) return; const t=c.currentTime;
+      const o=c.createOscillator(), g=c.createGain(); o.type='sawtooth';
+      o.frequency.setValueAtTime(70,t); o.frequency.linearRampToValueAtTime(130,t+0.5);
+      g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.12,t+0.15); g.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
+      o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.65); },
+    // ② 走査:往復に合わせたビープ
+    sweep(durMs){ const c=ac(); if(!c||!on) return; const t=c.currentTime, n=5;
+      for(let i=0;i<n;i++) tone(900+i*60, t+(durMs/1000)*(i/n), 0.08, 'square', 0.10); },
+    // ③ 解析:高速の電子ティック
+    analyze(durMs){ const c=ac(); if(!c||!on) return; const t=c.currentTime, n=10;
+      for(let i=0;i<n;i++) tone(1400+(i%3)*180, t+(durMs/1000)*(i/n), 0.05, 'triangle', 0.06); },
+    // ④ 完了:上昇アルペジオ＋ベル
+    complete(){ const c=ac(); if(!c||!on) return; const t=c.currentTime;
+      [523.25,659.25,783.99,1046.5].forEach((f,i)=> tone(f, t+i*0.09, 0.5, 'sine', 0.16));
+      tone(1568, t+0.36, 0.9, 'sine', 0.08); }   // ベル倍音
+  };
+})();
+
+function toggleSound(btn){ const on=se.toggle(); btn.textContent = on ? '🔊' : '🔇'; btn.classList.toggle('off', !on); }
+
+function enterResult(){
+  show('result');
+  const r = current || rollScores();
+  const gr = gradeOf(r.overall), th = gr.t;
+
+  // ── グレード別カラーを動的適用 ──
+  $('#gg0').setAttribute('stop-color', th.c);
+  $('#gg1').setAttribute('stop-color', th.c2);
+  ['#rScore','#rGrade'].forEach(s=>{ $(s).style.color=th.c; $(s).style.textShadow=th.glow; });
+  $('#rGrade').textContent = gr.g;
+  const cond=$('#rCond'); cond.textContent = gr.cond; cond.style.color=th.c;
+  document.querySelector('.gauge').classList.toggle('warn', gr.g==='D');   // D=警告グロー
+
+  // ── 各項目スコア＆レベルバッジ ──
+  [['#scBody','#lvBody',r.body],['#scTear','#lvTear',r.tear],['#scCoat','#lvCoat',r.coat]].forEach(([sc,lv,v])=>{
+    const [cls,txt]=metricLevel(v);
+    $(sc).textContent=v; $(sc).style.color = cls==='good'?'var(--neon-green)':cls==='watch'?'var(--neon-amber)':'var(--neon-red)';
+    $(lv).className='lv '+cls; $(lv).textContent=txt;
+  });
+
+  // 健康年齢(スコアに応じて軽く変動・演出用)
+  $('#rHealthAge').textContent = (7 - (r.overall-50)/14).toFixed(1) + '歳 ✨';
+
+  // ── ゲージ:overall/100 ──
+  const arc=$('#gaugeArc'); const circ=553; const off=circ*(1-r.overall/100);
+  arc.style.strokeDashoffset=circ;
+  arc.style.transition='stroke-dashoffset 1s ease'; requestAnimationFrame(()=>arc.style.strokeDashoffset=off);
+  countUp($('#rScore'),0,r.overall,1000);
+
+  // 履歴に記録 + ホームの前回スコア更新
+  histData.week.push(r.overall); if(histData.week.length>9) histData.week.shift();
+  $('#homeLast').textContent = r.overall; $('#homeLastGr').textContent = gr.g;
+
+  particleBurst(th.c, th.c2);
+  buzz([30,60,30]);
+}
+
+/* パーティクルバースト:着地時にゲージ中心から放射 */
+function particleBurst(c1,c2){
+  if(reduce) return;
+  const host=$('#burst'); if(!host) return;
+  const N=28;
+  for(let i=0;i<N;i++){
+    const p=document.createElement('span'); p.className='particle';
+    const col = i%2 ? c1 : c2;
+    p.style.background=col; p.style.boxShadow='0 0 8px '+col;
+    host.appendChild(p);
+    const a=Math.random()*Math.PI*2, d=70+Math.random()*130, dly=Math.random()*120;
+    setTimeout(()=>{ p.style.transform=`translate(${Math.cos(a)*d}px, ${Math.sin(a)*d}px) scale(0)`; p.style.opacity='0'; }, dly);
+    setTimeout(()=>p.remove(), 1000+dly);
+  }
+}
+
+/* ════════ 履歴グラフ ════════ */
+const histData = {
+  week: [78,82,80,85,88,84,90,92],
+  month:[74,79,83,86,88,90,92],
+  year: [68,71,73,77,80,82,84,86,88,90,91,92]
+};
+const RANGE_LABEL = { week:'WEEKLY', month:'MONTHLY', year:'YEARLY' };
+let curRange = 'week';
+function showHistory(){
+  $('#hTitle').innerHTML = pet.name + ' の健康推移 <small>HEALTH TREND</small>';
+  show('history');
+  setRange(curRange, document.querySelector('.range button[data-r="'+curRange+'"]'));
+}
+function setRange(r, btn){
+  curRange=r;
+  document.querySelectorAll('.range button').forEach(b=>b.classList.toggle('on', b===btn));
+  const data=histData[r];
+  drawChart(data);
+  $('#hCur').textContent = data[data.length-1];
+  $('#hCurLabel').textContent = RANGE_LABEL[r] + ' · LATEST';
+}
+function drawChart(data){
+  const svg=$('#chart'); const W=320,H=180, pl=16, pr=16, pt=18, pb=22;
+  const n=data.length, min=Math.min(...data)-6, max=Math.max(...data)+4;
+  const xs=i=> pl + (W-pl-pr)*(n===1?0.5:i/(n-1));
+  const ys=v=> pt + (H-pt-pb)*(1-(v-min)/((max-min)||1));
+  let line=''; data.forEach((v,i)=>{ line+=(i?'L':'M')+xs(i).toFixed(1)+' '+ys(v).toFixed(1)+' '; });
+  const area = line + 'L'+xs(n-1).toFixed(1)+' '+(H-pb)+' L'+xs(0).toFixed(1)+' '+(H-pb)+' Z';
+  let dots=''; data.forEach((v,i)=>{ const last=i===n-1; dots+=`<circle cx="${xs(i).toFixed(1)}" cy="${ys(v).toFixed(1)}" r="${last?4.2:2.6}" fill="${last?'#36F1B3':'#27E1FF'}"/>`; });
+  let grid=''; for(let g=0; g<=3; g++){ const y=(pt+(H-pt-pb)*g/3).toFixed(1); grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="rgba(255,255,255,.06)"/>`; }
+  svg.innerHTML = `<defs><linearGradient id="harea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(39,225,255,.32)"/><stop offset="1" stop-color="rgba(39,225,255,0)"/></linearGradient></defs>`
+    + grid
+    + `<path d="${area}" fill="url(#harea)"/>`
+    + `<path d="${line}" fill="none" stroke="#27E1FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(39,225,255,.6))"/>`
+    + dots;
+}
+
+/* ── 初期化 ── */
+(function init(){
+  fillYears();
+  selectSpecies('dog');          // 種別初期選択 + 犬種リスト生成
+  // デフォルト値をプリフィル
+  $('#fName').value   = pet.name;
+  $('#fYear').value   = pet.birthY;
+  $('#fMonth').value  = pet.birthM;
+  $('#fWeight').value = pet.weight;
+  applyPet();                    // ホーム/スキャン/結果に反映
+  show('splash');
+})();
+</script>
+</body>
+</html>
