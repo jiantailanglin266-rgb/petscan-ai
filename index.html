@@ -11,11 +11,17 @@
 <meta property="og:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta property="og:description" content="犬・猫対応。30秒で無料診断。AIが体・目元・口元・毛並み・皮膚の5観点でスコア化。" />
 <meta property="og:image" content="https://place.dog/1200/630" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="MOFURI. — 写真1枚で、うちの子の健康年齢をAI分析" />
 <meta property="og:url" content="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
+<meta property="og:locale" content="ja_JP" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta name="twitter:description" content="犬・猫対応。30秒で無料診断。" />
 <meta name="twitter:image" content="https://place.dog/1200/630" />
+<link rel="canonical" href="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l14 14-14 14L2 16z' fill='%23F4A340'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
@@ -30,7 +36,11 @@
   --r-sm:12px; --r-md:18px; --r-lg:24px; --r-pill:999px;
 }
 *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth; scroll-padding-top:78px}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto}
+  .beam.run{opacity:.5} .grid.show{opacity:.35} .crystal.show{opacity:1; transform:none}
+}
 body{font-family:"Noto Sans JP","Inter",system-ui,sans-serif; background:var(--bg); color:var(--text-hi); line-height:1.6; overflow-x:hidden}
 img{display:block; max-width:100%}
 .mono{font-family:"Space Grotesk",sans-serif}
@@ -85,7 +95,7 @@ img{display:block; max-width:100%}
 .opt-grid.c2{grid-template-columns:1fr 1fr}
 .opt-grid.auto{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 .opt-grid.auto .opt{padding:18px 16px;font-size:15px}
-.wiz-select{width:100%;padding:16px 18px;border-radius:var(--r-md);border:1px solid var(--line2);background:var(--card);color:var(--text-hi);font-family:inherit;font-size:16px;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),linear-gradient(135deg,var(--accent) 50%,transparent 50%);background-position:calc(100% - 22px) 25px,calc(100% - 16px) 25px;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.wiz-select{width:100%;padding:16px 44px 16px 18px;border-radius:var(--r-md);border:1px solid var(--line2);background:var(--card);color:var(--text-hi);font-family:inherit;font-size:16px;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),linear-gradient(135deg,var(--accent) 50%,transparent 50%);background-position:calc(100% - 22px) calc(50% - 3px),calc(100% - 16px) calc(50% - 3px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}
 .wiz-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(244,163,64,.2)}
 .wiz-select option{background:#111}
 .chips{display:flex;flex-wrap:wrap;gap:11px;justify-content:center}
@@ -95,6 +105,7 @@ img{display:block; max-width:100%}
 .opt{position:relative; display:flex; align-items:center; gap:16px; padding:22px 24px; border-radius:var(--r-md); border:1px solid var(--line2); background:var(--card); cursor:pointer; transition:.18s; font-size:16px; font-weight:600; color:var(--text-hi)}
 .opt:hover{border-color:var(--line); background:var(--card2)}
 .opt.sel{border-color:var(--accent); box-shadow:var(--glow); background:linear-gradient(135deg,rgba(244,163,64,.12),rgba(244,163,64,.03))}
+.opt:focus-visible,.chip:focus-visible,.cta:focus-visible,.sbtn:focus-visible,.wiz-select:focus-visible,.backbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .opt .oic{width:46px;height:46px;flex:0 0 auto;color:var(--accent)}
 .opt .oic svg{width:100%;height:100%}
 .opt small{display:block;font-size:11.5px;color:var(--text-low);font-weight:500;margin-top:2px}
@@ -176,6 +187,7 @@ img{display:block; max-width:100%}
 .delta{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:17px;color:var(--good)}
 .delta.old{color:var(--attn)}
 .cond{margin-top:10px;color:var(--text-mid);font-size:13.5px}
+.r-note{margin-top:6px;color:var(--text-low);font-size:10.5px}
 
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
 .statcard{background:var(--card);border:1px solid var(--line2);border-radius:var(--r-md);padding:18px}
@@ -236,6 +248,8 @@ img{display:block; max-width:100%}
 .referral h3{font-size:18px;font-weight:900}
 .referral p{color:var(--text-mid);font-size:13px;margin-top:8px}
 .referral .cta{max-width:320px;margin:18px auto 0}
+.ref-again{display:block;margin:14px auto 0;background:none;border:none;color:var(--text-mid);font-family:inherit;font-size:13px;cursor:pointer}
+.ref-again:hover{color:var(--accent)}
 .disclaimer{font-size:10px;color:var(--text-low);text-align:center;line-height:1.7;margin-top:22px;padding:0 12px}
 
 @media(max-width:860px){
@@ -275,7 +289,7 @@ img{display:block; max-width:100%}
           </div>
         </div>
         <div class="hero-media">
-          <img src="https://place.dog/900/820" alt="pet" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="https://place.dog/900/820" alt="健康そうな犬と猫" width="900" height="820" fetchpriority="high" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="fb" style="display:none">🐾</div>
           <svg class="hero-deco" viewBox="0 0 230 160" fill="none" id="heroDeco"></svg>
         </div>
@@ -334,9 +348,10 @@ img{display:block; max-width:100%}
           </div>
           <div class="delta" id="rDelta">−2.4歳 若見え ✨</div>
           <div class="cond" id="rCond">非常に良好なコンディションです</div>
+          <div class="r-note">※健康管理のための目安です（医療診断ではありません）</div>
         </div>
         <div class="stats">
-          <div class="statcard rank"><div class="k">同年代の{種}の中で</div><div class="v" id="rRank">上位8<span class="u">%</span></div><div class="bar"><i id="rRankBar" style="width:92%"></i></div></div>
+          <div class="statcard rank"><div class="k">同年代の中で</div><div class="v" id="rRank">上位8<span class="u">%</span></div><div class="bar"><i id="rRankBar" style="width:92%"></i></div></div>
           <div class="statcard dev"><div class="k">健康偏差値</div><div class="v" id="rDev">72</div><div class="bar"><i id="rDevBar" style="width:72%"></i></div></div>
         </div>
       </div>
@@ -361,7 +376,7 @@ img{display:block; max-width:100%}
 
       <div class="sec">
         <div class="sec-t">AIコメント</div>
-        <div class="story"><div class="qh">💬 獣医師監修トーンのAIコメント</div><p id="rStory"></p></div>
+        <div class="story"><div class="qh">💬 AIからのコメント</div><p id="rStory"></p></div>
       </div>
 
       <div class="sec">
@@ -388,9 +403,10 @@ img{display:block; max-width:100%}
       </div>
 
       <div class="referral">
-        <h3>あなたのペットも診断してみませんか？</h3>
-        <p>無料で、うちの子の健康年齢をチェック。</p>
-        <button class="cta" onclick="restart()">無料で健康年齢を診断する</button>
+        <h3>友達の子の健康年齢も、気になりませんか？</h3>
+        <p>結果をシェアして、友達のペットも診断してあげよう。</p>
+        <button class="cta" onclick="shareX()">シェアして広める 🐾</button>
+        <button class="ref-again" onclick="restart()">別の写真でもう一度診断する ›</button>
       </div>
       <div class="disclaimer">※本結果は健康管理のための目安であり、獣医療・診断ではありません。気になる場合は獣医師にご相談ください。スコア等はデモ用の参考値です。</div>
     </div>
@@ -476,8 +492,10 @@ const STEPS=[
   {k:'photo',   t:'お写真をアップロード', s:'顔がはっきり写った写真だと精度が上がります（ドラッグ＆ドロップ対応）。'},
 ];
 const TOTAL=STEPS.length;
-function grid(items){ return `<div class="opt-grid auto">`+items.join('')+`</div>`; }
-function card(key,label){ return `<div class="opt center ${wiz[key]===label?'sel':''}" onclick="pickStep('${key}','${label.replace(/'/g,"\\'")}')">${label}</div>`; }
+function grid(items){ return `<div class="opt-grid auto" role="radiogroup">`+items.join('')+`</div>`; }
+function actKey(e,fn){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(); } }
+function card(key,label){ const v=label.replace(/'/g,"\\'"); const sel=wiz[key]===label;
+  return `<div class="opt center ${sel?'sel':''}" role="radio" aria-checked="${sel}" tabindex="0" onclick="pickStep('${key}','${v}')" onkeydown="actKey(event,()=>pickStep('${key}','${v}'))">${label}</div>`; }
 
 function renderStep(){
   const cfg=STEPS[step-1];
@@ -487,9 +505,9 @@ function renderStep(){
   const back = step>1 ? '<button class="backbtn" onclick="prevStep()">‹ 戻る</button>' : '';
   let html=back;
   if(cfg.k==='species'){
-    html+=`<div class="opt-grid c2">
-      <div class="opt center ${wiz.species==='dog'?'sel':''}" onclick="pickStep('species','dog')"><span class="oic">${DOG_ICON}</span>犬</div>
-      <div class="opt center ${wiz.species==='cat'?'sel':''}" onclick="pickStep('species','cat')"><span class="oic">${CAT_ICON}</span>猫</div></div>`;
+    html+=`<div class="opt-grid c2" role="radiogroup" aria-label="ペットの種類">
+      <div class="opt center ${wiz.species==='dog'?'sel':''}" role="radio" aria-checked="${wiz.species==='dog'}" tabindex="0" onclick="pickStep('species','dog')" onkeydown="actKey(event,()=>pickStep('species','dog'))"><span class="oic">${DOG_ICON}</span>犬</div>
+      <div class="opt center ${wiz.species==='cat'?'sel':''}" role="radio" aria-checked="${wiz.species==='cat'}" tabindex="0" onclick="pickStep('species','cat')" onkeydown="actKey(event,()=>pickStep('species','cat'))"><span class="oic">${CAT_ICON}</span>猫</div></div>`;
   } else if(cfg.k==='breed'){
     const list = breedList();
     html+=`<select class="wiz-select" id="breedSel" onchange="onBreed(this.value)">
@@ -499,7 +517,7 @@ function renderStep(){
   } else if(cfg.k==='size'){
     html+=grid((wiz.species==='dog'?DOG_SIZES:CAT_SIZES).map(l=>card('size',l)));
   } else if(cfg.k==='age'){
-    html+=grid(AGES.map(([l,id,rep])=>`<div class="opt center ${wiz.age===id?'sel':''}" onclick="pickAge('${id}',${rep})">${l}</div>`));
+    html+=grid(AGES.map(([l,id,rep])=>`<div class="opt center ${wiz.age===id?'sel':''}" role="radio" aria-checked="${wiz.age===id}" tabindex="0" onclick="pickAge('${id}',${rep})" onkeydown="actKey(event,()=>pickAge('${id}',${rep}))">${l}</div>`));
   } else if(cfg.k==='sex'){      html+=grid(SEXES.map(l=>card('sex',l)));
   } else if(cfg.k==='altered'){  html+=grid(ALTERED.map(l=>card('altered',l)));
   } else if(cfg.k==='body'){     html+=grid(BODY.map(l=>card('body',l)));
@@ -527,7 +545,8 @@ function toggleConcern(c){
   else { wiz.concerns = wiz.concerns.filter(x=>x!=='特になし'); wiz.concerns.includes(c)? wiz.concerns=wiz.concerns.filter(x=>x!==c) : wiz.concerns.push(c); }
   renderStep();
 }
-function flashNext(){ renderStep(); setTimeout(nextStep, 220); }
+let _flashTimer=null;
+function flashNext(){ renderStep(); clearTimeout(_flashTimer); _flashTimer=setTimeout(nextStep, 220); }
 function nextStep(){ if(step<TOTAL){ step++; renderStep(); $('#wizardSec').scrollIntoView({behavior:'smooth',block:'start'}); } }
 function prevStep(){ if(step>1){ step--; renderStep(); } }
 function bindDrop(){
@@ -543,7 +562,21 @@ function setPhoto(f){ wiz.photo=URL.createObjectURL(f); $('#dropPic').innerHTML=
 /* ── スコア/グレード ── */
 const rand=(a,b)=>Math.round(a+Math.random()*(b-a));
 const METRICS=[['body','体型','⚖️','適正体型・肥満リスク'],['eyes','目元','👁️','涙やけ・目の周り'],['mouth','口元','🦷','歯・口元の状態'],['coat','毛並み','✨','毛並み・ツヤ'],['skin','皮膚','🌿','皮膚・被毛の地肌']];
-function rollScores(){ const s={}; METRICS.forEach(m=>s[m[0]]=rand(58,98)); s.overall=Math.round(METRICS.reduce((a,m)=>a+s[m[0]],0)/5); return s; }
+function rollScores(){
+  // 入力値で中央値を±傾斜(ダミーでも“入力した意味”を感じられるように)
+  const bodyMod = ({'ちょうどいい':3,'痩せ気味':0,'ぽっちゃり':-4})[wiz.body] ?? 0;
+  const actMod  = ({'よく動く':3,'ふつう':0,'あまり動かない':-3})[wiz.activity] ?? 0;
+  const altMod  = wiz.altered==='避妊・去勢済み' ? 1 : 0;
+  const ageMod  = ({1:2,4:1,8:-1,12:-3})[wiz.ageRep] ?? 0;
+  const center  = Math.min(94, Math.max(60, 78 + bodyMod + actMod + altMod + ageMod));
+  const s={};
+  METRICS.forEach(m=>{ s[m[0]] = Math.min(99, Math.max(45, rand(center-9, center+9))); });
+  // 気になる観点として選ばれた項目は少し下げる(実感に寄せる)
+  const CMAP={'涙やけ':'eyes','毛並み・抜け毛':'coat','体重':'body','口臭・歯':'mouth','皮膚・かゆみ':'skin'};
+  (wiz.concerns||[]).forEach(c=>{ const k=CMAP[c]; if(k) s[k]=Math.max(45,s[k]-rand(5,12)); });
+  s.overall=Math.round(METRICS.reduce((a,m)=>a+s[m[0]],0)/5);
+  return s;
+}
 function tierColor(v){ return v>=85?'var(--good)':v>=70?'var(--watch)':'var(--attn)'; }
 function gradeTheme(o){
   if(o>=90) return {c:'#5FD0A0',cond:'非常に優秀なコンディションです'};
@@ -566,11 +599,13 @@ function storyOf(o){
 }
 
 /* ── スキャン演出 ── */
-let result=null;
+let result=null, scanRunning=false, _st=[], _sr=[];
+function clearScan(){ _st.forEach(clearTimeout); _sr.forEach(cancelAnimationFrame); _st=[]; _sr=[]; }
 const ANA=['顔の輪郭を分析中...','目元コンディションを確認中...','毛並み・皮膚状態を評価中...','健康年齢を算出中...'];
 function showView(id){ ['landing','scan','result'].forEach(v=>$('#'+v).classList.toggle('active', v===id)); }
 function startScan(){
-  if(!wiz.photo) return;
+  if(!wiz.photo || scanRunning) return;
+  clearScan(); scanRunning=true;
   se.resume();
   result=rollScores();
   const img=wiz.photo;
@@ -581,10 +616,10 @@ function startScan(){
   subj.classList.remove('in','trace'); beams.forEach(b=>b.classList.remove('run')); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show'); crystal.textContent='0';
   $('#phaseText').textContent=''; $('#prog2').style.width='0%';
   $('#anaLines').innerHTML=ANA.map((t,i)=>`<div class="al" id="al${i}"><span class="ck">✓</span>${t}</div>`).join('');
-  const T=reduce?0.4:1; const timers=[],rafs=[];
-  const step2=(fn,ms)=>timers.push(setTimeout(fn,ms*T));
-  const ramp=(el,from,to,dur)=>{const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.style.width=(from+(to-from)*k)+'%';if(k<1)rafs.push(requestAnimationFrame(f));};rafs.push(requestAnimationFrame(f));};
-  const count=(el,to,dur)=>{const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.textContent=Math.round(to*k);if(k<1)rafs.push(requestAnimationFrame(f));};rafs.push(requestAnimationFrame(f));};
+  const T=reduce?0.4:1;
+  const step2=(fn,ms)=>_st.push(setTimeout(fn,ms*T));
+  const ramp=(el,from,to,dur)=>{const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.style.width=(from+(to-from)*k)+'%';if(k<1)_sr.push(requestAnimationFrame(f));};_sr.push(requestAnimationFrame(f));};
+  const count=(el,to,dur)=>{const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.textContent=Math.round(to*k);if(k<1)_sr.push(requestAnimationFrame(f));};_sr.push(requestAnimationFrame(f));};
   const line=(i,ms)=>{ step2(()=>{const e=$('#al'+i);if(e)e.classList.add('on');},ms); step2(()=>{const e=$('#al'+i);if(e){e.classList.remove('on');e.classList.add('done');}},ms+900); };
 
   step2(()=>{subj.classList.add('in');buzz(20);se.hum();},60);
@@ -592,15 +627,16 @@ function startScan(){
   step2(()=>{$('#phaseText').textContent='ANALYZING…';ring.classList.add('show');se.analyze(2200*T);ramp($('#prog2'),40,94,2400*T);},2200);
   line(0,2200); line(1,3100); line(2,4000); line(3,4900);
   step2(()=>{$('#phaseText').textContent='SCAN COMPLETE';crystal.style.color=gradeTheme(result.overall).c;crystal.classList.add('show');count(crystal,result.overall,900*T);ramp($('#prog2'),94,100,500*T);buzz(40);se.complete();},5600);
-  step2(()=>enterResult(),6700);
+  step2(()=>{ enterResult(); scanRunning=false; },6700);
 }
 
 /* ── 結果描画 ── */
 function enterResult(){
   const r=result, gt=gradeTheme(r.overall), [em,title]=titleOf(r.overall);
   const realAge = wiz.ageRep||8;
-  const delta = Math.round((r.overall-68)/9*10)/10;
-  const healthAge = Math.max(0.3, Math.round((realAge-delta)*10)/10);
+  const ratio = 1 - (r.overall-68)*0.008;                 // 高スコアほど若く・実年齢に比例
+  const healthAge = Math.max(0.3, Math.round(realAge*ratio*10)/10);
+  const delta = Math.round((realAge-healthAge)*10)/10;    // 実年齢−健康年齢(正=若見え)
   const topPct = Math.min(70, Math.max(1, Math.round((100-r.overall)*0.85)+2));
   const dev = Math.min(82, Math.max(28, Math.round(50+(r.overall-72)*1.05)));
   const sp = wiz.species==='cat'?'猫':'犬';
@@ -608,9 +644,11 @@ function enterResult(){
   $('#rTitleEm').textContent=em; $('#rTitle').textContent=title;
   $('#rMeta').innerHTML=`<b>${wiz.breed||(sp+'種')}</b>　${realAge}歳　${wiz.sex||'性別不明'}`;
   $('#rRealAge').textContent=realAge+'歳'; $('#rHealthAge').textContent=healthAge+'歳';
-  const dEl=$('#rDelta');
-  if(delta>=0){ dEl.className='delta'; dEl.textContent=`−${delta}歳 若見え ✨`; }
-  else { dEl.className='delta old'; dEl.textContent=`+${Math.abs(delta)}歳 お疲れ気味`; }
+  const youthful=delta>0.05, aged=delta<-0.05;
+  const deltaShort = youthful?`−${delta}歳 若見え` : aged?`+${Math.abs(delta)}歳` : '実年齢どおり';
+  const deltaColor = youthful?'var(--good)' : aged?'var(--attn)' : 'var(--accent2)';
+  const dEl=$('#rDelta'); dEl.className='delta'+(aged?' old':'');
+  dEl.textContent = youthful?`−${delta}歳 若見え ✨` : aged?`+${Math.abs(delta)}歳 お疲れ気味` : 'ほぼ実年齢どおり ✨';
   $('#rCond').textContent=gt.cond;
   $('#result .statcard.rank .k').textContent=`同年代の${sp}の中で`;
   $('#rRank').innerHTML=`上位${topPct}<span class="u">%</span>`; $('#rRankBar').style.width=(100-topPct)+'%';
@@ -630,9 +668,9 @@ function enterResult(){
   $('#careHint').textContent=`${hint}が気になる時に。`;
   // share card
   $('#scHealth').textContent=healthAge; $('#scHealth2').textContent=healthAge; $('#scReal').textContent=realAge;
-  const scD=$('#scDelta'); scD.textContent=delta>=0?`−${delta}歳 若見え`:`+${Math.abs(delta)}歳`; scD.style.color=delta>=0?'var(--good)':'var(--attn)';
+  const scD=$('#scDelta'); scD.textContent=deltaShort; scD.style.color=deltaColor;
   $('#scTitle').textContent=`${em} ${title}`;
-  window._share={healthAge,realAge,delta,title,em,overall:r.overall,breed:wiz.breed};
+  window._share={healthAge,realAge,delta,deltaShort,title,em,overall:r.overall,breed:wiz.breed};
 
   showView('result'); window.scrollTo(0,0);
   requestAnimationFrame(()=>{ arc.style.strokeDashoffset=circ*(1-r.overall/100); });
@@ -652,21 +690,32 @@ function particleBurst(col){ if(reduce)return; const host=$('#burst'); host.inne
 /* ── シェア ── */
 function shareText(){ const s=window._share||{}; const b=s.breed?`(${s.breed})`:''; return `うちの子${b}の健康年齢は${s.healthAge}歳！(実年齢${s.realAge}歳) 称号「${s.title}」をゲット🐾 #MOFURI #うちの子健康診断`; }
 function shareX(){ const u=encodeURIComponent(location.href); const t=encodeURIComponent(shareText()); window.open(`https://twitter.com/intent/tweet?text=${t}&url=${u}`,'_blank'); }
-function shareLine(){ const u=encodeURIComponent(location.href); window.open(`https://social-plugins.line.me/lineit/share?url=${u}`,'_blank'); }
-function saveImage(){
+function shareLine(){ const t=encodeURIComponent(shareText()+'\n'+location.href); window.open(`https://line.me/R/msg/text/?${t}`,'_blank'); }
+async function saveImage(){
+  if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }   // フォント確定後に描画
   const s=window._share||{}; const W=1080,H=1080; const cv=document.createElement('canvas'); cv.width=W;cv.height=H; const x=cv.getContext('2d');
   const g=x.createRadialGradient(W*0.7,H*0.2,80,W*0.5,H*0.5,W*0.8); g.addColorStop(0,'#1c1408'); g.addColorStop(1,'#050505'); x.fillStyle=g; x.fillRect(0,0,W,H);
   x.fillStyle='#F4A340'; x.font='800 44px Inter,sans-serif'; x.textAlign='center'; x.fillText('◆ MOFURI.',W/2,150);
   x.fillStyle='#A8A29A'; x.font='500 34px "Noto Sans JP",sans-serif'; x.fillText('うちの子の健康年齢',W/2,300);
   x.fillStyle='#F4A340'; x.font='800 220px "Space Grotesk",Inter,sans-serif'; x.fillText(s.healthAge+'歳',W/2,540);
   x.fillStyle='#F6F2EA'; x.font='600 40px "Noto Sans JP",sans-serif'; x.fillText(`実年齢 ${s.realAge}歳  →  健康年齢 ${s.healthAge}歳`,W/2,650);
-  x.fillStyle=s.delta>=0?'#5FD0A0':'#E8635F'; x.font='800 56px "Noto Sans JP",sans-serif'; x.fillText(s.delta>=0?`−${s.delta}歳 若見え`:`+${Math.abs(s.delta)}歳`,W/2,760);
+  x.fillStyle=s.delta>0.05?'#5FD0A0':s.delta<-0.05?'#E8635F':'#FFC57D'; x.font='800 56px "Noto Sans JP",sans-serif'; x.fillText(s.deltaShort||'',W/2,760);
   x.fillStyle='#FFC57D'; x.font='700 46px "Noto Sans JP",sans-serif'; x.fillText(`${s.em} ${s.title}`,W/2,880);
   x.fillStyle='#6E6A63'; x.font='500 26px Inter,sans-serif'; x.fillText('AI HEALTH SCORE ・ MOFURI.',W/2,980);
-  const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click();
+  const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(isIOS){ // iOS Safari は download属性が効かない → 新規タブで開き長押し保存を案内
+    cv.toBlob(b=>{ if(!b) return; window.open(URL.createObjectURL(b),'_blank'); setTimeout(()=>alert('画像を長押しして「写真に追加」で保存できます 🐾'),300); },'image/png');
+  } else {
+    const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click();
+  }
 }
 
-function restart(){ wiz.species=wiz.size=wiz.age=wiz.sex=wiz.photo=null; wiz.ageRep=null; step=1; renderStep(); showView('landing'); window.scrollTo(0,0); }
+function restart(){
+  clearScan(); scanRunning=false;
+  if(wiz.photo && String(wiz.photo).startsWith('blob:')) URL.revokeObjectURL(wiz.photo);  // メモリ解放
+  Object.keys(wiz).forEach(k=>{ wiz[k] = (k==='concerns') ? [] : null; });               // 全キー明示リセット
+  step=1; renderStep(); showView('landing'); window.scrollTo(0,0);
+}
 
 /* ── init ── */
 paintLogos(); renderStep();
