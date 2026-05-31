@@ -86,7 +86,7 @@ body{
 
 /* ════════ SCAN OVERLAY ════════ */
 #scan{background:var(--bg-base); align-items:center; justify-content:center}
-.stage{position:relative; width:300px; height:300px; display:flex; align-items:center; justify-content:center}
+.stage{position:relative; width:360px; height:360px; max-width:96vw; display:flex; align-items:center; justify-content:center}
 .subject{position:relative; width:240px; height:240px; border-radius:24px; overflow:hidden; opacity:0; transform:scale(1.25); transition:transform .6s ease, opacity .6s ease}
 .subject img{width:100%; height:100%; object-fit:cover}
 .subject .fb{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:110px; background:linear-gradient(160deg,#16223f,#0a0f1e)}
@@ -105,15 +105,18 @@ body{
 @keyframes gridflash{0%,100%{opacity:0}50%{opacity:.7}}
 
 /* analysis ring */
-.ana-ring{position:absolute; width:300px; height:300px; opacity:0; transition:opacity .4s}
+.ana-ring{position:absolute; width:340px; height:340px; opacity:0; transition:opacity .4s}
 .ana-ring.show{opacity:1}
 .ana-ring i{position:absolute; inset:0; border-radius:50%; border:1px dashed rgba(123,108,255,.5); animation:spin 6s linear infinite}
 .ana-ring i:nth-child(2){inset:22px; border-style:solid; border-color:rgba(39,225,255,.25); animation-duration:9s; animation-direction:reverse}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* metric nodes */
-.node{position:absolute; opacity:0; transform:scale(.5); transition:all .4s cubic-bezier(.2,1.4,.4,1); text-align:center}
+/* metric nodes — placed in the stage margin, never overlapping the subject */
+.node{position:absolute; width:64px; opacity:0; transform:scale(.5); transition:all .4s cubic-bezier(.2,1.4,.4,1); text-align:center; z-index:3}
 .node.pop{opacity:1; transform:scale(1)}
+.node.top{top:4px; left:50%; margin-left:-32px}
+.node.left{top:50%; left:-6px; margin-top:-22px}
+.node.right{top:50%; right:-6px; margin-top:-22px}
 .node .dot{width:12px; height:12px; border-radius:50%; background:var(--neon-cyan); box-shadow:var(--glow-cyan); margin:0 auto 6px}
 .node .nm{font-family:"Space Grotesk"; font-size:9px; letter-spacing:.14em; color:var(--text-mid)}
 .node .nv{font-family:"Orbitron"; font-size:14px; color:var(--neon-cyan)}
@@ -174,10 +177,19 @@ body{
 .btn:active{transform:scale(.97)}
 
 .disclaimer{font-size:10px; color:var(--text-low); text-align:center; line-height:1.6; padding:4px 8px 20px}
+
+/* sound toggle */
+.sound-toggle{position:absolute; top:16px; right:16px; z-index:20; width:40px; height:40px; border-radius:50%;
+  border:1px solid var(--border-subtle); background:var(--surface-glass); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  color:var(--text-hi); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center}
+.sound-toggle.off{opacity:.55}
+.sound-toggle:active{transform:scale(.92)}
 </style>
 </head>
 <body>
 <div id="app">
+
+  <button class="sound-toggle" onclick="toggleSound(this)" aria-label="サウンド切替">🔊</button>
 
   <!-- ════════ HOME ════════ -->
   <section id="home" class="screen active">
@@ -208,9 +220,9 @@ body{
         <div class="beam" id="beam"></div>
       </div>
       <!-- metric nodes -->
-      <div class="node" id="n0" style="top:6px;left:50%;transform:translateX(-50%) scale(.5)"><div class="dot"></div><div class="nm">BODY</div><div class="nv" data-v="94">--</div></div>
-      <div class="node" id="n1" style="bottom:40px;left:6px"><div class="dot"></div><div class="nm">TEAR</div><div class="nv" data-v="88">--</div></div>
-      <div class="node" id="n2" style="bottom:40px;right:6px"><div class="dot"></div><div class="nm">COAT</div><div class="nv" data-v="78">--</div></div>
+      <div class="node top" id="n0"><div class="dot"></div><div class="nm">BODY</div><div class="nv" data-v="94">--</div></div>
+      <div class="node left" id="n1"><div class="dot"></div><div class="nm">TEAR</div><div class="nv" data-v="88">--</div></div>
+      <div class="node right" id="n2"><div class="dot"></div><div class="nm">COAT</div><div class="nv" data-v="78">--</div></div>
       <div class="crystal" id="crystal">0</div>
     </div>
     <div class="phase-text">
@@ -274,32 +286,37 @@ const screens = {home:$('#home'), scan:$('#scan'), result:$('#result')};
 function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); }
 function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let scanCount = 0;   // 0回目=フル演出 / 1回目以降=短縮演出
 
 function goHome(){ show('home'); }
 
 function startScan(){
   show('scan');
+  se.resume();                       // ユーザー操作直後にAudioContext起動
+  const quick = scanCount > 0;       // 2回目以降は短縮
+  scanCount++;
   // reset
   const subj=$('#subject'), beam=$('#beam'), grid=$('#grid'), ring=$('#anaRing'), crystal=$('#crystal');
   subj.classList.remove('in','trace'); beam.classList.remove('run'); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show');
   ['n0','n1','n2'].forEach(id=>{ $('#'+id).classList.remove('pop'); $('#'+id+' .nv').textContent='--'; });
   $('#phaseText').textContent=''; $('#progFill').style.width='0%'; $('#progLabel').textContent='INITIALIZING';
 
-  const T = reduce ? 0.35 : 1;   // reduced-motion shortens
+  // 速度係数:reduced-motion=0.35 / 短縮=0.6 / フル=1
+  const T = reduce ? 0.35 : (quick ? 0.6 : 1);
   const step = (fn,ms)=> setTimeout(fn, ms*T);
 
   // ① 0.0–0.6 起動・吸い込み
-  step(()=>{ subj.classList.add('in'); buzz(20); }, 60);
+  step(()=>{ subj.classList.add('in'); buzz(20); se.hum(); }, 60);
 
   // ② 0.6–2.2 走査 SCANNING
-  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beam.classList.add('run'); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(1500*T); }, 600);
+  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beam.classList.add('run'); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(); se.sweep(1500*T); }, 600);
 
   // ③ 2.2–3.6 解析HUD ANALYZING
-  step(()=>{ $('#phaseText').textContent='ANALYZING…'; $('#progLabel').textContent='AI VISION MODEL'; ring.classList.add('show'); popNode('n0',0); popNode('n1',180); popNode('n2',360); rollNodes(); rampProgress(46,90,1400*T); }, 2200);
+  step(()=>{ $('#phaseText').textContent='ANALYZING…'; $('#progLabel').textContent='AI VISION MODEL'; ring.classList.add('show'); popNode('n0',0); popNode('n1',180); popNode('n2',360); rollNodes(); rampProgress(46,90,1400*T); se.analyze(900*T); }, 2200);
   step(()=>{ $('#phaseText').textContent='HEALTH INDEX CALCULATED'; }, 3300);
 
   // ④ 3.6–4.8 ホログラム結晶化
-  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,92,900*T); rampProgress(90,100,600*T); buzz(40); }, 3600);
+  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,92,900*T); rampProgress(90,100,600*T); buzz(40); se.complete(); }, 3600);
 
   // ⑤ 着地 → 結果へ
   step(()=>{ enterResult(); }, 4900);
@@ -322,7 +339,47 @@ function countUp(el,from,to,dur){
   function f(now){ const k=Math.min(1,(now-t0)/dur); el.textContent=Math.round(from+(to-from)*k); if(k<1) requestAnimationFrame(f); }
   requestAnimationFrame(f);
 }
-function buzzPulse(dur){ if(!navigator.vibrate) return; navigator.vibrate([15,120,15,120,15]); }
+function buzzPulse(){ if(!navigator.vibrate) return; navigator.vibrate([15,120,15,120,15]); }
+
+/* ── Sound engine: Web Audio APIで生成(外部ファイル不要) ── */
+const se = (()=>{
+  let ctx=null, on=true;
+  const ac = ()=>{ if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return ctx; };
+  // 単発トーン
+  function tone(freq, t0, dur, type='sine', peak=0.18){
+    const c=ac(); if(!c||!on) return;
+    const o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(peak, t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0+dur+0.02);
+    return o;
+  }
+  return {
+    get on(){ return on; },
+    toggle(){ on=!on; if(on) this.resume(); return on; },
+    resume(){ const c=ac(); if(c&&c.state==='suspended') c.resume(); },
+    // ① 起動ハム:低音の立ち上がり
+    hum(){ const c=ac(); if(!c||!on) return; const t=c.currentTime;
+      const o=c.createOscillator(), g=c.createGain(); o.type='sawtooth';
+      o.frequency.setValueAtTime(70,t); o.frequency.linearRampToValueAtTime(130,t+0.5);
+      g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.12,t+0.15); g.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
+      o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.65); },
+    // ② 走査:往復に合わせたビープ
+    sweep(durMs){ const c=ac(); if(!c||!on) return; const t=c.currentTime, n=5;
+      for(let i=0;i<n;i++) tone(900+i*60, t+(durMs/1000)*(i/n), 0.08, 'square', 0.10); },
+    // ③ 解析:高速の電子ティック
+    analyze(durMs){ const c=ac(); if(!c||!on) return; const t=c.currentTime, n=10;
+      for(let i=0;i<n;i++) tone(1400+(i%3)*180, t+(durMs/1000)*(i/n), 0.05, 'triangle', 0.06); },
+    // ④ 完了:上昇アルペジオ＋ベル
+    complete(){ const c=ac(); if(!c||!on) return; const t=c.currentTime;
+      [523.25,659.25,783.99,1046.5].forEach((f,i)=> tone(f, t+i*0.09, 0.5, 'sine', 0.16));
+      tone(1568, t+0.36, 0.9, 'sine', 0.08); }   // ベル倍音
+  };
+})();
+
+function toggleSound(btn){ const on=se.toggle(); btn.textContent = on ? '🔊' : '🔇'; btn.classList.toggle('off', !on); }
 
 function enterResult(){
   show('result');
