@@ -98,6 +98,12 @@ body{
   background:linear-gradient(90deg,transparent,var(--neon-cyan) 50%,transparent);
   box-shadow:0 0 18px 4px rgba(39,225,255,.7); mix-blend-mode:screen}
 .beam.run{opacity:1; animation:sweep 1.6s ease-in-out}
+/* 残像トレイル:本体ビームを少し遅れて追う薄いゴースト */
+.beam.ghost{opacity:0; filter:blur(1.5px); height:6px}
+.beam.ghost.run{animation:sweep 1.6s ease-in-out}
+.beam.g1.run{opacity:.45; animation-delay:.06s}
+.beam.g2.run{opacity:.22; animation-delay:.12s; filter:blur(3px); height:9px}
+.beam.g3.run{opacity:.10; animation-delay:.18s; filter:blur(5px); height:14px}
 @keyframes sweep{0%{top:0}50%{top:236px}100%{top:0}}
 /* grid reveal */
 .grid{position:absolute; inset:0; opacity:0; background-image:linear-gradient(rgba(39,225,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(39,225,255,.25) 1px,transparent 1px); background-size:18px 18px; mix-blend-mode:screen}
@@ -161,6 +167,15 @@ body{
 .metric .lv{font-size:10px; letter-spacing:.12em; padding:3px 8px; border-radius:var(--radius-pill); font-family:"Space Grotesk"}
 .lv.good{color:var(--neon-green); background:rgba(54,241,179,.12)}
 .lv.watch{color:var(--neon-amber); background:rgba(255,200,87,.12)}
+.lv.attention{color:var(--neon-red); background:rgba(255,77,109,.12)}
+
+/* dynamic-theme transitions on result */
+.gauge .score, .gauge .grade, .cond, #gaugeArc{transition:color .5s ease, stroke .5s ease, text-shadow .5s ease}
+
+/* particle burst (result landing) */
+.burst{position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:5}
+.burst .particle{position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%;
+  opacity:1; transition:transform .85s cubic-bezier(.15,.7,.25,1), opacity .85s ease}
 
 .vet{background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
 .vet .h{font-size:12px; color:var(--neon-violet); margin-bottom:8px; font-weight:700}
@@ -217,6 +232,9 @@ body{
         <div class="fb" style="display:none">🐕</div>
         <div class="grid" id="grid"></div>
         <div class="edge"></div>
+        <div class="beam ghost g3" id="beamG3"></div>
+        <div class="beam ghost g2" id="beamG2"></div>
+        <div class="beam ghost g1" id="beamG1"></div>
         <div class="beam" id="beam"></div>
       </div>
       <!-- metric nodes -->
@@ -239,25 +257,26 @@ body{
         <svg width="200" height="200">
           <circle cx="100" cy="100" r="88" stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"/>
           <circle id="gaugeArc" cx="100" cy="100" r="88" stroke="url(#gg)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"/>
-          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#27E1FF"/><stop offset="1" stop-color="#36F1B3"/></linearGradient></defs>
+          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop id="gg0" offset="0" stop-color="#27E1FF"/><stop id="gg1" offset="1" stop-color="#36F1B3"/></linearGradient></defs>
         </svg>
-        <div class="center"><div class="score" id="rScore">0</div><div class="grade">A+</div></div>
+        <div class="center"><div class="score" id="rScore">0</div><div class="grade" id="rGrade">A+</div></div>
+        <div class="burst" id="burst"></div>
       </div>
-      <div class="cond">Excellent Condition</div>
+      <div class="cond" id="rCond">Excellent Condition</div>
     </div>
 
     <div class="agecard">
       <div class="blk"><div class="t">実年齢</div><div class="n">7.0歳</div></div>
       <div class="arrow">→</div>
-      <div class="blk"><div class="t">健康年齢</div><div class="n green">4.2歳 ✨</div></div>
+      <div class="blk"><div class="t">健康年齢</div><div class="n green" id="rHealthAge">4.2歳 ✨</div></div>
     </div>
 
     <div>
       <div class="sec-title">Scan Results</div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-        <div class="metric"><div class="ic">⚖️</div><div class="body"><div class="mt">BODY CONDITION</div><div class="ms">適正体型・肥満リスク低</div></div><div class="sc" style="color:var(--neon-green)">94</div><div class="lv good">GOOD</div></div>
-        <div class="metric"><div class="ic">👁️</div><div class="body"><div class="mt">TEAR STAIN</div><div class="ms">涙やけ・着色わずか</div></div><div class="sc" style="color:var(--neon-green)">88</div><div class="lv good">GOOD</div></div>
-        <div class="metric"><div class="ic">✨</div><div class="body"><div class="mt">COAT CONDITION</div><div class="ms">毛並み・季節で揺らぎ</div></div><div class="sc" style="color:var(--neon-amber)">78</div><div class="lv watch">WATCH</div></div>
+        <div class="metric"><div class="ic">⚖️</div><div class="body"><div class="mt">BODY CONDITION</div><div class="ms">適正体型・肥満リスク</div></div><div class="sc" id="scBody">94</div><div class="lv good" id="lvBody">GOOD</div></div>
+        <div class="metric"><div class="ic">👁️</div><div class="body"><div class="mt">TEAR STAIN</div><div class="ms">涙やけ・目周りの着色</div></div><div class="sc" id="scTear">88</div><div class="lv good" id="lvTear">GOOD</div></div>
+        <div class="metric"><div class="ic">✨</div><div class="body"><div class="mt">COAT CONDITION</div><div class="ms">毛並み・ツヤ</div></div><div class="sc" id="scCoat">78</div><div class="lv watch" id="lvCoat">WATCH</div></div>
       </div>
     </div>
 
@@ -287,6 +306,31 @@ function show(name){ Object.values(screens).forEach(s=>s.classList.remove('activ
 function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let scanCount = 0;   // 0回目=フル演出 / 1回目以降=短縮演出
+let current = null;  // 今回のスキャン結果(動的生成)
+
+/* ── グレード別テーマ ── */
+const THEMES = {
+  green:{c:'#36F1B3', c2:'#27E1FF', glow:'0 0 24px rgba(54,241,179,.55), 0 0 64px rgba(54,241,179,.22)', rgb:'54,241,179'},
+  cyan: {c:'#27E1FF', c2:'#36F1B3', glow:'0 0 24px rgba(39,225,255,.55), 0 0 64px rgba(39,225,255,.25)', rgb:'39,225,255'},
+  amber:{c:'#FFC857', c2:'#FFE29A', glow:'0 0 24px rgba(255,200,87,.5), 0 0 60px rgba(255,200,87,.2)',  rgb:'255,200,87'},
+  red:  {c:'#FF4D6D', c2:'#FF8AA0', glow:'0 0 22px rgba(255,77,109,.5), 0 0 56px rgba(255,77,109,.18)',  rgb:'255,77,109'},
+};
+function gradeOf(score){
+  if(score>=90) return {g:'A+', t:THEMES.green, cond:'Excellent Condition'};
+  if(score>=80) return {g:'A',  t:THEMES.cyan,  cond:'Great Condition'};
+  if(score>=70) return {g:'B',  t:THEMES.cyan,  cond:'Good Condition'};
+  if(score>=60) return {g:'C',  t:THEMES.amber, cond:'Fair Condition'};
+  return            {g:'D',  t:THEMES.red,   cond:'Needs Care'};
+}
+// 項目スコア → レベル(badge)
+function metricLevel(s){ return s>=85 ? ['good','GOOD'] : s>=70 ? ['watch','WATCH'] : ['attention','ATTENTION']; }
+const rand = (a,b)=> Math.round(a + Math.random()*(b-a));
+// 各項目スコアと総合スコアを生成
+function rollScores(){
+  const body=rand(64,98), tear=rand(62,96), coat=rand(58,95);
+  const overall=Math.round(body*0.5 + tear*0.25 + coat*0.25);
+  return {body, tear, coat, overall};
+}
 
 function goHome(){ show('home'); }
 
@@ -295,10 +339,18 @@ function startScan(){
   se.resume();                       // ユーザー操作直後にAudioContext起動
   const quick = scanCount > 0;       // 2回目以降は短縮
   scanCount++;
+  // 今回の結果を動的生成 → グレードでテーマ決定
+  current = rollScores();
+  const theme = gradeOf(current.overall).t;
   // reset
-  const subj=$('#subject'), beam=$('#beam'), grid=$('#grid'), ring=$('#anaRing'), crystal=$('#crystal');
-  subj.classList.remove('in','trace'); beam.classList.remove('run'); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show');
+  const beams = ['#beam','#beamG1','#beamG2','#beamG3'].map($);
+  const subj=$('#subject'), grid=$('#grid'), ring=$('#anaRing'), crystal=$('#crystal');
+  subj.classList.remove('in','trace'); beams.forEach(b=>b.classList.remove('run')); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show');
+  // ノードの確定値を今回のスコアに
+  $('#n0 .nv').dataset.v=current.body; $('#n1 .nv').dataset.v=current.tear; $('#n2 .nv').dataset.v=current.coat;
   ['n0','n1','n2'].forEach(id=>{ $('#'+id).classList.remove('pop'); $('#'+id+' .nv').textContent='--'; });
+  // クリスタル(結晶化スコア)をテーマ色に
+  crystal.style.color=theme.c; crystal.style.textShadow=theme.glow;
   $('#phaseText').textContent=''; $('#progFill').style.width='0%'; $('#progLabel').textContent='INITIALIZING';
 
   // 速度係数:reduced-motion=0.35 / 短縮=0.6 / フル=1
@@ -309,14 +361,14 @@ function startScan(){
   step(()=>{ subj.classList.add('in'); buzz(20); se.hum(); }, 60);
 
   // ② 0.6–2.2 走査 SCANNING
-  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beam.classList.add('run'); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(); se.sweep(1500*T); }, 600);
+  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beams.forEach(b=>b.classList.add('run')); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(); se.sweep(1500*T); }, 600);
 
   // ③ 2.2–3.6 解析HUD ANALYZING
   step(()=>{ $('#phaseText').textContent='ANALYZING…'; $('#progLabel').textContent='AI VISION MODEL'; ring.classList.add('show'); popNode('n0',0); popNode('n1',180); popNode('n2',360); rollNodes(); rampProgress(46,90,1400*T); se.analyze(900*T); }, 2200);
   step(()=>{ $('#phaseText').textContent='HEALTH INDEX CALCULATED'; }, 3300);
 
   // ④ 3.6–4.8 ホログラム結晶化
-  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,92,900*T); rampProgress(90,100,600*T); buzz(40); se.complete(); }, 3600);
+  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,current.overall,900*T); rampProgress(90,100,600*T); buzz(40); se.complete(); }, 3600);
 
   // ⑤ 着地 → 結果へ
   step(()=>{ enterResult(); }, 4900);
@@ -383,11 +435,50 @@ function toggleSound(btn){ const on=se.toggle(); btn.textContent = on ? '🔊' :
 
 function enterResult(){
   show('result');
-  // gauge fill: 92/100 of circumference 553
-  const arc=$('#gaugeArc'); const circ=553; const off=circ*(1-0.92);
+  const r = current || rollScores();
+  const gr = gradeOf(r.overall), th = gr.t;
+
+  // ── グレード別カラーを動的適用 ──
+  $('#gg0').setAttribute('stop-color', th.c);
+  $('#gg1').setAttribute('stop-color', th.c2);
+  ['#rScore','#rGrade'].forEach(s=>{ $(s).style.color=th.c; $(s).style.textShadow=th.glow; });
+  $('#rGrade').textContent = gr.g;
+  const cond=$('#rCond'); cond.textContent = gr.cond; cond.style.color=th.c;
+
+  // ── 各項目スコア＆レベルバッジ ──
+  [['#scBody','#lvBody',r.body],['#scTear','#lvTear',r.tear],['#scCoat','#lvCoat',r.coat]].forEach(([sc,lv,v])=>{
+    const [cls,txt]=metricLevel(v);
+    $(sc).textContent=v; $(sc).style.color = cls==='good'?'var(--neon-green)':cls==='watch'?'var(--neon-amber)':'var(--neon-red)';
+    $(lv).className='lv '+cls; $(lv).textContent=txt;
+  });
+
+  // 健康年齢(スコアに応じて軽く変動・演出用)
+  $('#rHealthAge').textContent = (7 - (r.overall-50)/14).toFixed(1) + '歳 ✨';
+
+  // ── ゲージ:overall/100 ──
+  const arc=$('#gaugeArc'); const circ=553; const off=circ*(1-r.overall/100);
+  arc.style.strokeDashoffset=circ;
   arc.style.transition='stroke-dashoffset 1s ease'; requestAnimationFrame(()=>arc.style.strokeDashoffset=off);
-  countUp($('#rScore'),0,92,1000);
+  countUp($('#rScore'),0,r.overall,1000);
+
+  particleBurst(th.c, th.c2);
   buzz([30,60,30]);
+}
+
+/* パーティクルバースト:着地時にゲージ中心から放射 */
+function particleBurst(c1,c2){
+  if(reduce) return;
+  const host=$('#burst'); if(!host) return;
+  const N=28;
+  for(let i=0;i<N;i++){
+    const p=document.createElement('span'); p.className='particle';
+    const col = i%2 ? c1 : c2;
+    p.style.background=col; p.style.boxShadow='0 0 8px '+col;
+    host.appendChild(p);
+    const a=Math.random()*Math.PI*2, d=70+Math.random()*130, dly=Math.random()*120;
+    setTimeout(()=>{ p.style.transform=`translate(${Math.cos(a)*d}px, ${Math.sin(a)*d}px) scale(0)`; p.style.opacity='0'; }, dly);
+    setTimeout(()=>p.remove(), 1000+dly);
+  }
 }
 </script>
 </body>
