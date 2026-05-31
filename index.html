@@ -199,6 +199,60 @@ body{
   color:var(--text-hi); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center}
 .sound-toggle.off{opacity:.55}
 .sound-toggle:active{transform:scale(.92)}
+
+/* ════════ JACKET / SPLASH ════════ */
+#splash{align-items:center; justify-content:center; text-align:center; padding:40px 30px}
+.jacket{display:flex; flex-direction:column; align-items:center; gap:22px}
+.jacket .radar{position:relative; width:168px; height:168px; border-radius:50%;
+  border:2px solid rgba(39,225,255,.45); box-shadow:var(--glow-cyan), inset 0 0 44px rgba(39,225,255,.15)}
+.jacket .radar .sweep{position:absolute; inset:-2px; border-radius:50%; mix-blend-mode:screen;
+  background:conic-gradient(from 0deg, rgba(39,225,255,.5), rgba(39,225,255,0) 90deg); animation:radar 2.6s linear infinite}
+.jacket .radar .glyph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:58px; filter:drop-shadow(0 0 14px rgba(39,225,255,.6))}
+.jacket .pulsering{position:absolute; inset:0; border-radius:50%; border:1px solid rgba(39,225,255,.5); animation:pulseOut 2.8s ease-out infinite}
+.jacket .pulsering.d2{animation-delay:1.4s}
+@keyframes pulseOut{0%{transform:scale(1); opacity:.6}100%{transform:scale(1.85); opacity:0}}
+.jacket .title{font-family:"Orbitron"; font-weight:900; letter-spacing:.14em; font-size:33px; margin-top:6px}
+.jacket .title span{color:var(--neon-cyan); text-shadow:var(--glow-cyan)}
+.jacket .tag{font-size:14px; color:var(--text-mid); letter-spacing:.04em}
+.jacket .sub{font-size:13px; color:var(--text-low); line-height:1.8; margin-top:-6px}
+.cta-lg{margin-top:8px; padding:16px 40px; border-radius:var(--radius-pill); border:none; cursor:pointer;
+  background:var(--grad-cta); color:#04121a; font-family:"Noto Sans JP"; font-weight:700; font-size:16px; box-shadow:var(--glow-cyan);
+  display:inline-flex; align-items:center; gap:10px}
+.cta-lg span{font-family:"Orbitron"}
+.cta-lg:active{transform:scale(.97)}
+.splash-note{font-size:10px; color:var(--text-low); line-height:1.6; margin-top:10px; max-width:280px}
+
+/* ════════ PROFILE / PERSONA ════════ */
+#profile{padding:26px 22px 36px; gap:16px; overflow-y:auto}
+.p-head{display:flex; align-items:center; gap:10px}
+.p-head .back{width:38px; height:38px; flex:0 0 auto; border-radius:50%; border:1px solid var(--border-subtle);
+  background:var(--surface-1); color:var(--text-hi); font-size:22px; line-height:1; cursor:pointer}
+.p-head .back:active{transform:scale(.92)}
+.p-title{font-family:"Noto Sans JP"; font-weight:700; font-size:22px; line-height:1.35}
+.species{display:flex; gap:12px}
+.species .opt{flex:1; padding:18px 10px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);
+  background:var(--surface-1); text-align:center; cursor:pointer; transition:all .2s}
+.species .opt .emoji{font-size:36px}
+.species .opt .lbl{font-size:13px; color:var(--text-mid); margin-top:4px; letter-spacing:.1em}
+.species .opt.sel{border-color:var(--neon-cyan); box-shadow:var(--glow-cyan);
+  background:linear-gradient(135deg,rgba(39,225,255,.14),rgba(123,108,255,.08))}
+.species .opt.sel .lbl{color:var(--neon-cyan)}
+.photo-field{display:flex; align-items:center; gap:14px; cursor:pointer; padding:8px 2px}
+.photo-prev{width:62px; height:62px; flex:0 0 auto; border-radius:16px; border:1px dashed var(--border-subtle);
+  background:var(--surface-1); display:flex; align-items:center; justify-content:center; font-size:26px; color:var(--neon-cyan); overflow:hidden}
+.photo-prev img{width:100%; height:100%; object-fit:cover}
+.photo-txt{font-size:14px; color:var(--text-mid)}
+.photo-txt small{color:var(--text-low); font-size:11px; margin-left:4px}
+.field{display:flex; flex-direction:column; gap:7px}
+.field label{font-size:12px; color:var(--text-mid); letter-spacing:.04em}
+.field input,.field select{background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-sm);
+  padding:13px 14px; color:var(--text-hi); font-family:inherit; font-size:15px; width:100%; -webkit-appearance:none; appearance:none}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--neon-cyan) 50%),linear-gradient(135deg,var(--neon-cyan) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px; background-size:5px 5px,5px 5px; background-repeat:no-repeat}
+.field input:focus,.field select:focus{outline:none; border-color:var(--neon-cyan); box-shadow:0 0 0 2px rgba(39,225,255,.2)}
+.field option{background:#0B1020; color:var(--text-hi)}
+.row{display:flex; gap:12px}
+.row .field{flex:1}
 </style>
 </head>
 <body>
@@ -206,13 +260,70 @@ body{
 
   <button class="sound-toggle" onclick="toggleSound(this)" aria-label="サウンド切替">🔊</button>
 
+  <!-- ════════ JACKET / SPLASH ════════ -->
+  <section id="splash" class="screen active">
+    <div class="jacket">
+      <div class="radar">
+        <span class="pulsering"></span><span class="pulsering d2"></span>
+        <span class="sweep"></span>
+        <span class="glyph" id="splashGlyph">🐾</span>
+      </div>
+      <div class="title">PETSCAN <span>AI</span></div>
+      <div class="tag">愛を、テクノロジーで可視化する。</div>
+      <div class="sub">スマホで撮るだけ。AIがこの子を<br>スキャンし、健康を可視化する。</div>
+      <button class="cta-lg" onclick="show('profile')">はじめる <span>→</span></button>
+      <div class="splash-note">※本サービスは健康管理のための情報提供です。獣医療・診断ではありません。</div>
+    </div>
+  </section>
+
+  <!-- ════════ PROFILE / PERSONA INPUT ════════ -->
+  <section id="profile" class="screen">
+    <div class="p-head">
+      <button class="back" onclick="show('splash')">‹</button>
+      <div class="p-title">この子のことを<br>教えてください</div>
+    </div>
+
+    <div class="species">
+      <div class="opt sel" data-s="dog" onclick="selectSpecies('dog')"><div class="emoji">🐶</div><div class="lbl">いぬ</div></div>
+      <div class="opt" data-s="cat" onclick="selectSpecies('cat')"><div class="emoji">🐱</div><div class="lbl">ねこ</div></div>
+    </div>
+
+    <label class="photo-field">
+      <span class="photo-prev" id="photoPrev">＋</span>
+      <span class="photo-txt">写真を追加<small>（任意）</small></span>
+      <input type="file" accept="image/*" onchange="onPhoto(this)" hidden />
+    </label>
+
+    <div class="field">
+      <label>なまえ</label>
+      <input id="fName" type="text" placeholder="例：モカ" maxlength="20" />
+    </div>
+
+    <div class="row">
+      <div class="field"><label>たんじょうび（年）</label><select id="fYear"></select></div>
+      <div class="field"><label>月</label><select id="fMonth"></select></div>
+    </div>
+
+    <div class="field">
+      <label>犬種・猫種</label>
+      <select id="fBreed"></select>
+    </div>
+
+    <div class="field">
+      <label>いまの体重（kg）</label>
+      <input id="fWeight" type="number" step="0.1" min="0" placeholder="例：4.2" inputmode="decimal" />
+    </div>
+
+    <button class="cta-lg" onclick="submitProfile()">登録してスキャンへ <span>→</span></button>
+  </section>
+
   <!-- ════════ HOME ════════ -->
-  <section id="home" class="screen active">
+  <section id="home" class="screen">
     <div class="brand"><i class="ring"></i><b>PETSCAN <span>AI</span></b></div>
     <div class="hero">
-      <img src="https://place.dog/600/700" alt="pet" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-      <div class="fallback" style="display:none">🐕</div>
-      <div class="cap">モカ の健康を、今日も。</div>
+      <img id="homeImg" src="https://place.dog/600/700" alt="pet" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div class="fallback" id="homeFb" style="display:none">🐕</div>
+      <div class="cap" id="homeCap">モカ の健康を、今日も。</div>
     </div>
     <div class="scan-wrap">
       <button class="scanbtn" onclick="startScan()">SCAN<br>NOW<small>TAP TO SCAN</small></button>
@@ -228,8 +339,8 @@ body{
     <div class="stage">
       <div class="ana-ring" id="anaRing"><i></i><i></i></div>
       <div class="subject" id="subject">
-        <img src="https://place.dog/400/400" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-        <div class="fb" style="display:none">🐕</div>
+        <img id="subjImg" src="https://place.dog/400/400" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="fb" id="subjFb" style="display:none">🐕</div>
         <div class="grid" id="grid"></div>
         <div class="edge"></div>
         <div class="beam ghost g3" id="beamG3"></div>
@@ -266,7 +377,7 @@ body{
     </div>
 
     <div class="agecard">
-      <div class="blk"><div class="t">実年齢</div><div class="n">7.0歳</div></div>
+      <div class="blk"><div class="t">実年齢</div><div class="n" id="rRealAge">7.0歳</div></div>
       <div class="arrow">→</div>
       <div class="blk"><div class="t">健康年齢</div><div class="n green" id="rHealthAge">4.2歳 ✨</div></div>
     </div>
@@ -301,8 +412,8 @@ body{
 
 <script>
 const $ = s => document.querySelector(s);
-const screens = {home:$('#home'), scan:$('#scan'), result:$('#result')};
-function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); }
+const screens = {splash:$('#splash'), profile:$('#profile'), home:$('#home'), scan:$('#scan'), result:$('#result')};
+function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); if(screens[name].scrollTo) screens[name].scrollTop=0; }
 function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let scanCount = 0;   // 0回目=フル演出 / 1回目以降=短縮演出
@@ -333,6 +444,68 @@ function rollScores(){
 }
 
 function goHome(){ show('home'); }
+
+/* ════════ ペルソナ(プロフィール) ════════ */
+const pet = { species:'dog', name:'モカ', breed:'トイプードル', birthY:2019, birthM:4, weight:4.2, photo:null };
+const BREEDS = {
+  dog:['トイプードル','チワワ','柴犬','ミニチュアダックス','ポメラニアン','フレンチブルドッグ','ゴールデンレトリバー','ミックス','その他'],
+  cat:['スコティッシュフォールド','マンチカン','アメリカンショートヘア','ノルウェージャンフォレスト','ラグドール','ブリティッシュショートヘア','雑種(MIX)','その他']
+};
+const DEMO_IMG = {
+  dog:{ home:'https://place.dog/600/700', scan:'https://place.dog/400/400' },
+  cat:{ home:'https://cataas.com/cat?width=600&height=700', scan:'https://cataas.com/cat?width=440&height=440' }
+};
+function selectSpecies(s){
+  pet.species=s;
+  document.querySelectorAll('.species .opt').forEach(o=>o.classList.toggle('sel', o.dataset.s===s));
+  $('#splashGlyph').textContent = s==='cat' ? '🐈' : '🐾';
+  fillBreeds();
+  if(!pet.photo){ const pv=$('#photoPrev'); pv.textContent = s==='cat'?'🐱':'🐶'; }
+}
+function fillBreeds(){
+  const sel=$('#fBreed'); const keep=sel.value; sel.innerHTML='';
+  BREEDS[pet.species].forEach(b=>{ const o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o); });
+  if([...sel.options].some(o=>o.value===keep)) sel.value=keep;
+}
+function fillYears(){
+  const y=$('#fYear'); const now=new Date().getFullYear();
+  for(let v=now; v>=now-22; v--){ const o=document.createElement('option'); o.value=v; o.textContent=v+'年'; y.appendChild(o); }
+  const m=$('#fMonth'); for(let v=1; v<=12; v++){ const o=document.createElement('option'); o.value=v; o.textContent=v+'月'; m.appendChild(o); }
+}
+function onPhoto(input){
+  const f=input.files && input.files[0]; if(!f) return;
+  pet.photo=URL.createObjectURL(f);
+  const pv=$('#photoPrev'); pv.innerHTML=''; const im=new Image(); im.src=pet.photo; pv.appendChild(im);
+}
+function submitProfile(){
+  pet.name   = ($('#fName').value||'').trim() || 'この子';
+  pet.breed  = $('#fBreed').value;
+  pet.birthY = +$('#fYear').value;
+  pet.birthM = +$('#fMonth').value;
+  pet.weight = parseFloat($('#fWeight').value) || pet.weight;
+  applyPet();
+  show('home');
+}
+function petAge(){
+  const now=new Date();
+  const age = (now.getFullYear()-pet.birthY) + ((now.getMonth()+1)-pet.birthM)/12;
+  return Math.max(0.1, age);
+}
+function applyPet(){
+  const isCat = pet.species==='cat';
+  const emoji = isCat ? '🐈' : '🐕';
+  const homeSrc = pet.photo || DEMO_IMG[pet.species].home;
+  const scanSrc = pet.photo || DEMO_IMG[pet.species].scan;
+  // home
+  const hi=$('#homeImg'); hi.style.display='block'; hi.src=homeSrc;
+  const hf=$('#homeFb'); hf.style.display='none'; hf.textContent=emoji;
+  $('#homeCap').textContent = pet.name + ' の健康を、今日も。';
+  // scan subject
+  const si=$('#subjImg'); si.style.display='block'; si.src=scanSrc;
+  const sf=$('#subjFb'); sf.style.display='none'; sf.textContent=emoji;
+  // result real age
+  $('#rRealAge').textContent = petAge().toFixed(1) + '歳';
+}
 
 function startScan(){
   show('scan');
@@ -480,6 +653,19 @@ function particleBurst(c1,c2){
     setTimeout(()=>p.remove(), 1000+dly);
   }
 }
+
+/* ── 初期化 ── */
+(function init(){
+  fillYears();
+  selectSpecies('dog');          // 種別初期選択 + 犬種リスト生成
+  // デフォルト値をプリフィル
+  $('#fName').value   = pet.name;
+  $('#fYear').value   = pet.birthY;
+  $('#fMonth').value  = pet.birthM;
+  $('#fWeight').value = pet.weight;
+  applyPet();                    // ホーム/スキャン/結果に反映
+  show('splash');
+})();
 </script>
 </body>
 </html>
