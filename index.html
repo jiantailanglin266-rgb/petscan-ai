@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>PETSCAN AI — Scan Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  /* ── Base ── */
+  --bg-base:#05060A; --bg-deep:#0B1020;
+  --surface-1:#121A2E; --surface-2:#1A2540;
+  --surface-glass:rgba(26,37,64,.55);
+  --border-subtle:rgba(39,225,255,.15);
+  /* ── Neon ── */
+  --neon-cyan:#27E1FF; --neon-green:#36F1B3; --neon-violet:#7B6CFF;
+  --neon-amber:#FFC857; --neon-red:#FF4D6D;
+  /* ── Text ── */
+  --text-hi:#EAF6FF; --text-mid:#9FB2C9; --text-low:#5E708A;
+  /* ── FX ── */
+  --glow-cyan:0 0 24px rgba(39,225,255,.55), 0 0 64px rgba(39,225,255,.25);
+  --glow-green:0 0 24px rgba(54,241,179,.55), 0 0 64px rgba(54,241,179,.22);
+  --shadow-card:0 8px 40px rgba(0,0,0,.45);
+  --grad-bg:radial-gradient(120% 80% at 50% 0%, #0B1020 0%, #05060A 70%);
+  --grad-cta:linear-gradient(135deg, #27E1FF 0%, #7B6CFF 100%);
+  --radius-sm:12px; --radius-md:20px; --radius-lg:28px; --radius-pill:999px;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"Noto Sans JP",system-ui,sans-serif;
+  background:var(--grad-bg); color:var(--text-hi);
+  overflow:hidden; display:flex; justify-content:center; align-items:center;
+}
+.label{font-family:"Space Grotesk",sans-serif; letter-spacing:.16em; text-transform:uppercase; font-size:12px; color:var(--text-mid)}
+.mono{font-family:"Orbitron",sans-serif}
+
+/* ── App frame (phone) ── */
+#app{
+  position:relative; width:100%; max-width:430px; height:100dvh; max-height:932px;
+  overflow:hidden; background:var(--grad-bg);
+}
+/* drifting particles bg */
+#app::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(rgba(39,225,255,.10) 1px, transparent 1px);
+  background-size:34px 34px; opacity:.5; animation:drift 24s linear infinite;
+}
+@keyframes drift{to{background-position:0 -340px}}
+
+.screen{position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .5s ease}
+.screen.active{opacity:1; pointer-events:auto}
+
+/* ════════ HOME ════════ */
+#home{padding:28px 22px; justify-content:space-between}
+.brand{display:flex; align-items:center; gap:10px; justify-content:center; margin-top:8px}
+.brand .ring{width:22px; height:22px; border-radius:50%; border:2px solid var(--neon-cyan); position:relative; box-shadow:var(--glow-cyan)}
+.brand .ring::after{content:""; position:absolute; left:50%; top:1px; width:1px; height:9px; background:var(--neon-cyan); transform-origin:bottom; animation:radar 2.4s linear infinite}
+@keyframes radar{to{transform:rotate(360deg)}}
+.brand b{font-family:"Orbitron",sans-serif; letter-spacing:.14em; font-size:15px}
+.brand b span{color:var(--neon-cyan)}
+
+.hero{position:relative; border-radius:var(--radius-lg); overflow:hidden; flex:1; margin:18px 0; box-shadow:var(--shadow-card); border:1px solid var(--border-subtle)}
+.hero img{width:100%; height:100%; object-fit:cover; display:block}
+.hero .fallback{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:120px; background:linear-gradient(160deg,#16223f,#0a0f1e)}
+.hero .cap{position:absolute; left:0; right:0; bottom:0; padding:40px 18px 16px; background:linear-gradient(transparent,rgba(5,6,10,.85)); font-weight:700; font-size:18px}
+
+.scan-wrap{display:flex; flex-direction:column; align-items:center; gap:18px; padding-bottom:6px}
+.scanbtn{
+  position:relative; width:188px; height:188px; border-radius:50%; border:none; cursor:pointer;
+  background:var(--grad-cta); color:#04121a; font-family:"Orbitron",sans-serif; font-weight:900;
+  letter-spacing:.12em; font-size:19px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  box-shadow:0 0 0 0 rgba(39,225,255,.5); animation:pulse 2.4s ease-out infinite; transition:transform .12s;
+}
+.scanbtn small{font-family:"Space Grotesk"; font-weight:500; font-size:10px; letter-spacing:.2em; opacity:.7}
+.scanbtn:active{transform:scale(.95)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(39,225,255,.45), var(--glow-cyan)} 70%{box-shadow:0 0 0 26px rgba(39,225,255,0), var(--glow-cyan)} 100%{box-shadow:0 0 0 0 rgba(39,225,255,0), var(--glow-cyan)}}
+.scanbtn::before{content:""; position:absolute; inset:8px; border-radius:50%; border:1px solid rgba(4,18,26,.35)}
+
+.statbar{display:flex; gap:10px; width:100%}
+.stat{flex:1; background:var(--surface-glass); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 14px; display:flex; align-items:center; justify-content:space-between}
+.stat .v{font-family:"Orbitron"; font-size:22px; color:var(--neon-green)}
+.stat .v.cyan{color:var(--neon-cyan)}
+
+/* ════════ SCAN OVERLAY ════════ */
+#scan{background:var(--bg-base); align-items:center; justify-content:center}
+.stage{position:relative; width:300px; height:300px; display:flex; align-items:center; justify-content:center}
+.subject{position:relative; width:240px; height:240px; border-radius:24px; overflow:hidden; opacity:0; transform:scale(1.25); transition:transform .6s ease, opacity .6s ease}
+.subject img{width:100%; height:100%; object-fit:cover}
+.subject .fb{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:110px; background:linear-gradient(160deg,#16223f,#0a0f1e)}
+.subject.in{opacity:1; transform:scale(1)}
+.subject .edge{position:absolute; inset:0; box-shadow:inset 0 0 0 1px rgba(39,225,255,0); transition:box-shadow .4s}
+.subject.trace .edge{box-shadow:inset 0 0 0 1.5px rgba(39,225,255,.8), inset 0 0 30px rgba(39,225,255,.25)}
+/* scan beam */
+.beam{position:absolute; left:-5%; width:110%; height:3px; top:0; opacity:0;
+  background:linear-gradient(90deg,transparent,var(--neon-cyan) 50%,transparent);
+  box-shadow:0 0 18px 4px rgba(39,225,255,.7); mix-blend-mode:screen}
+.beam.run{opacity:1; animation:sweep 1.6s ease-in-out}
+@keyframes sweep{0%{top:0}50%{top:236px}100%{top:0}}
+/* grid reveal */
+.grid{position:absolute; inset:0; opacity:0; background-image:linear-gradient(rgba(39,225,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(39,225,255,.25) 1px,transparent 1px); background-size:18px 18px; mix-blend-mode:screen}
+.grid.show{animation:gridflash 1.6s ease-in-out}
+@keyframes gridflash{0%,100%{opacity:0}50%{opacity:.7}}
+
+/* analysis ring */
+.ana-ring{position:absolute; width:300px; height:300px; opacity:0; transition:opacity .4s}
+.ana-ring.show{opacity:1}
+.ana-ring i{position:absolute; inset:0; border-radius:50%; border:1px dashed rgba(123,108,255,.5); animation:spin 6s linear infinite}
+.ana-ring i:nth-child(2){inset:22px; border-style:solid; border-color:rgba(39,225,255,.25); animation-duration:9s; animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* metric nodes */
+.node{position:absolute; opacity:0; transform:scale(.5); transition:all .4s cubic-bezier(.2,1.4,.4,1); text-align:center}
+.node.pop{opacity:1; transform:scale(1)}
+.node .dot{width:12px; height:12px; border-radius:50%; background:var(--neon-cyan); box-shadow:var(--glow-cyan); margin:0 auto 6px}
+.node .nm{font-family:"Space Grotesk"; font-size:9px; letter-spacing:.14em; color:var(--text-mid)}
+.node .nv{font-family:"Orbitron"; font-size:14px; color:var(--neon-cyan)}
+
+/* phase text */
+.phase-text{position:absolute; bottom:90px; left:0; right:0; text-align:center}
+.phase-text .pt{font-family:"Orbitron"; font-size:18px; letter-spacing:.18em; color:var(--neon-cyan); min-height:24px; text-shadow:var(--glow-cyan)}
+.progressbar{width:200px; height:4px; border-radius:4px; background:rgba(255,255,255,.08); margin:14px auto 0; overflow:hidden}
+.progressbar i{display:block; height:100%; width:0; background:var(--grad-cta); box-shadow:var(--glow-cyan)}
+.progresslabel{font-family:"Space Grotesk"; font-size:11px; letter-spacing:.2em; color:var(--text-low); margin-top:8px}
+
+/* crystallized score */
+.crystal{position:absolute; opacity:0; transform:scale(.4); transition:all .5s cubic-bezier(.2,1.5,.4,1); font-family:"Orbitron"; font-weight:900; font-size:96px; color:var(--neon-green); text-shadow:var(--glow-green)}
+.crystal.show{opacity:1; transform:scale(1)}
+
+/* ════════ RESULT ════════ */
+#result{padding:24px 20px; overflow-y:auto; gap:18px; background:var(--grad-bg)}
+#result.active{animation:slideup .6s ease}
+@keyframes slideup{from{transform:translateY(30px); opacity:0}to{transform:translateY(0); opacity:1}}
+.r-head{text-align:center; padding-top:6px}
+.gauge{position:relative; width:200px; height:200px; margin:6px auto 2px}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+.gauge .score{font-family:"Orbitron"; font-weight:900; font-size:62px; color:var(--neon-green); line-height:1; text-shadow:var(--glow-green)}
+.gauge .grade{font-family:"Orbitron"; font-weight:700; font-size:20px; color:var(--neon-green); margin-top:2px}
+.cond{font-family:"Space Grotesk"; letter-spacing:.18em; font-size:13px; color:var(--neon-green); text-transform:uppercase; text-align:center}
+
+.agecard{display:flex; align-items:center; justify-content:center; gap:14px; background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.agecard .blk{text-align:center}
+.agecard .blk .t{font-size:11px; color:var(--text-mid)}
+.agecard .blk .n{font-family:"Orbitron"; font-size:22px}
+.agecard .arrow{color:var(--neon-cyan); font-size:20px}
+.agecard .blk .n.green{color:var(--neon-green)}
+
+.sec-title{font-family:"Space Grotesk"; letter-spacing:.16em; font-size:11px; color:var(--text-low); text-transform:uppercase; margin:2px 0}
+.metric{display:flex; align-items:center; gap:12px; background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px}
+.metric .ic{font-size:22px; width:34px; text-align:center}
+.metric .body{flex:1}
+.metric .body .mt{font-family:"Space Grotesk"; font-size:12px; letter-spacing:.1em; color:var(--text-mid)}
+.metric .body .ms{font-size:11px; color:var(--text-low); margin-top:2px}
+.metric .sc{font-family:"Orbitron"; font-size:24px}
+.metric .lv{font-size:10px; letter-spacing:.12em; padding:3px 8px; border-radius:var(--radius-pill); font-family:"Space Grotesk"}
+.lv.good{color:var(--neon-green); background:rgba(54,241,179,.12)}
+.lv.watch{color:var(--neon-amber); background:rgba(255,200,87,.12)}
+
+.vet{background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.vet .h{font-size:12px; color:var(--neon-violet); margin-bottom:8px; font-weight:700}
+.vet p{font-size:13px; line-height:1.7; color:var(--text-hi)}
+
+.care{border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; background:linear-gradient(135deg,rgba(123,108,255,.10),rgba(39,225,255,.06))}
+.care .t{font-size:12px; color:var(--text-mid)}
+.care .l{font-weight:700; margin-top:4px; display:flex; align-items:center; justify-content:space-between}
+.care .l span{color:var(--neon-cyan)}
+
+.r-actions{display:flex; gap:10px}
+.btn{flex:1; padding:14px; border-radius:var(--radius-pill); border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-hi); font-family:"Noto Sans JP"; font-weight:700; font-size:13px; cursor:pointer}
+.btn.primary{background:var(--grad-cta); color:#04121a; border:none; box-shadow:var(--glow-cyan)}
+.btn:active{transform:scale(.97)}
+
+.disclaimer{font-size:10px; color:var(--text-low); text-align:center; line-height:1.6; padding:4px 8px 20px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════ HOME ════════ -->
+  <section id="home" class="screen active">
+    <div class="brand"><i class="ring"></i><b>PETSCAN <span>AI</span></b></div>
+    <div class="hero">
+      <img src="https://place.dog/600/700" alt="pet" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div class="fallback" style="display:none">🐕</div>
+      <div class="cap">モカ の健康を、今日も。</div>
+    </div>
+    <div class="scan-wrap">
+      <button class="scanbtn" onclick="startScan()">SCAN<br>NOW<small>TAP TO SCAN</small></button>
+      <div class="statbar">
+        <div class="stat"><span class="label">前回スコア</span><span class="v">92 <small style="font-size:12px">A+</small></span></div>
+        <div class="stat"><span class="label">連続記録</span><span class="v cyan">🔥 7日</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ SCAN OVERLAY ════════ -->
+  <section id="scan" class="screen">
+    <div class="stage">
+      <div class="ana-ring" id="anaRing"><i></i><i></i></div>
+      <div class="subject" id="subject">
+        <img src="https://place.dog/400/400" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="fb" style="display:none">🐕</div>
+        <div class="grid" id="grid"></div>
+        <div class="edge"></div>
+        <div class="beam" id="beam"></div>
+      </div>
+      <!-- metric nodes -->
+      <div class="node" id="n0" style="top:6px;left:50%;transform:translateX(-50%) scale(.5)"><div class="dot"></div><div class="nm">BODY</div><div class="nv" data-v="94">--</div></div>
+      <div class="node" id="n1" style="bottom:40px;left:6px"><div class="dot"></div><div class="nm">TEAR</div><div class="nv" data-v="88">--</div></div>
+      <div class="node" id="n2" style="bottom:40px;right:6px"><div class="dot"></div><div class="nm">COAT</div><div class="nv" data-v="78">--</div></div>
+      <div class="crystal" id="crystal">0</div>
+    </div>
+    <div class="phase-text">
+      <div class="pt" id="phaseText"></div>
+      <div class="progressbar"><i id="progFill"></i></div>
+      <div class="progresslabel" id="progLabel">INITIALIZING</div>
+    </div>
+  </section>
+
+  <!-- ════════ RESULT ════════ -->
+  <section id="result" class="screen">
+    <div class="r-head">
+      <div class="gauge">
+        <svg width="200" height="200">
+          <circle cx="100" cy="100" r="88" stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"/>
+          <circle id="gaugeArc" cx="100" cy="100" r="88" stroke="url(#gg)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"/>
+          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#27E1FF"/><stop offset="1" stop-color="#36F1B3"/></linearGradient></defs>
+        </svg>
+        <div class="center"><div class="score" id="rScore">0</div><div class="grade">A+</div></div>
+      </div>
+      <div class="cond">Excellent Condition</div>
+    </div>
+
+    <div class="agecard">
+      <div class="blk"><div class="t">実年齢</div><div class="n">7.0歳</div></div>
+      <div class="arrow">→</div>
+      <div class="blk"><div class="t">健康年齢</div><div class="n green">4.2歳 ✨</div></div>
+    </div>
+
+    <div>
+      <div class="sec-title">Scan Results</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div class="metric"><div class="ic">⚖️</div><div class="body"><div class="mt">BODY CONDITION</div><div class="ms">適正体型・肥満リスク低</div></div><div class="sc" style="color:var(--neon-green)">94</div><div class="lv good">GOOD</div></div>
+        <div class="metric"><div class="ic">👁️</div><div class="body"><div class="mt">TEAR STAIN</div><div class="ms">涙やけ・着色わずか</div></div><div class="sc" style="color:var(--neon-green)">88</div><div class="lv good">GOOD</div></div>
+        <div class="metric"><div class="ic">✨</div><div class="body"><div class="mt">COAT CONDITION</div><div class="ms">毛並み・季節で揺らぎ</div></div><div class="sc" style="color:var(--neon-amber)">78</div><div class="lv watch">WATCH</div></div>
+      </div>
+    </div>
+
+    <div class="vet">
+      <div class="h">💬 獣医師監修コメント</div>
+      <p>毛並みは季節で揺らぎがちです。日々のブラッシングと食事の見直しが一般的なケアです。気になる状態が続く場合は獣医師にご相談ください。</p>
+    </div>
+
+    <div class="care">
+      <div class="t">毛並みが気になる時に。</div>
+      <div class="l">わんにゃんエクラ <span>›</span></div>
+    </div>
+
+    <div class="r-actions">
+      <button class="btn" onclick="goHome()">履歴</button>
+      <button class="btn primary" onclick="startScan()">もう一度スキャン</button>
+    </div>
+    <div class="disclaimer">※本結果は健康管理のための目安です。獣医療・診断ではありません。気になる場合は獣医師にご相談ください。</div>
+  </section>
+
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const screens = {home:$('#home'), scan:$('#scan'), result:$('#result')};
+function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); }
+function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function goHome(){ show('home'); }
+
+function startScan(){
+  show('scan');
+  // reset
+  const subj=$('#subject'), beam=$('#beam'), grid=$('#grid'), ring=$('#anaRing'), crystal=$('#crystal');
+  subj.classList.remove('in','trace'); beam.classList.remove('run'); grid.classList.remove('show'); ring.classList.remove('show'); crystal.classList.remove('show');
+  ['n0','n1','n2'].forEach(id=>{ $('#'+id).classList.remove('pop'); $('#'+id+' .nv').textContent='--'; });
+  $('#phaseText').textContent=''; $('#progFill').style.width='0%'; $('#progLabel').textContent='INITIALIZING';
+
+  const T = reduce ? 0.35 : 1;   // reduced-motion shortens
+  const step = (fn,ms)=> setTimeout(fn, ms*T);
+
+  // ① 0.0–0.6 起動・吸い込み
+  step(()=>{ subj.classList.add('in'); buzz(20); }, 60);
+
+  // ② 0.6–2.2 走査 SCANNING
+  step(()=>{ $('#phaseText').textContent='SCANNING…'; $('#progLabel').textContent='SURFACE SCAN'; beam.classList.add('run'); grid.classList.add('show'); subj.classList.add('trace'); rampProgress(8,46,1500*T); buzzPulse(1500*T); }, 600);
+
+  // ③ 2.2–3.6 解析HUD ANALYZING
+  step(()=>{ $('#phaseText').textContent='ANALYZING…'; $('#progLabel').textContent='AI VISION MODEL'; ring.classList.add('show'); popNode('n0',0); popNode('n1',180); popNode('n2',360); rollNodes(); rampProgress(46,90,1400*T); }, 2200);
+  step(()=>{ $('#phaseText').textContent='HEALTH INDEX CALCULATED'; }, 3300);
+
+  // ④ 3.6–4.8 ホログラム結晶化
+  step(()=>{ $('#phaseText').textContent='SCAN COMPLETE'; $('#progLabel').textContent='DONE'; crystal.classList.add('show'); countUp(crystal,0,92,900*T); rampProgress(90,100,600*T); buzz(40); }, 3600);
+
+  // ⑤ 着地 → 結果へ
+  step(()=>{ enterResult(); }, 4900);
+}
+
+function rampProgress(from,to,dur){
+  const fill=$('#progFill'), t0=performance.now();
+  function f(now){ const k=Math.min(1,(now-t0)/dur); const v=from+(to-from)*k; fill.style.width=v+'%'; if(k<1) requestAnimationFrame(f); }
+  requestAnimationFrame(f);
+}
+function popNode(id,delay){ setTimeout(()=>$('#'+id).classList.add('pop'), delay); }
+function rollNodes(){
+  document.querySelectorAll('.node .nv').forEach(el=>{
+    const target=+el.dataset.v; let i=0;
+    const iv=setInterval(()=>{ el.textContent=Math.floor(Math.random()*100); if(++i>14){ clearInterval(iv); el.textContent=target; } }, 70);
+  });
+}
+function countUp(el,from,to,dur){
+  const t0=performance.now();
+  function f(now){ const k=Math.min(1,(now-t0)/dur); el.textContent=Math.round(from+(to-from)*k); if(k<1) requestAnimationFrame(f); }
+  requestAnimationFrame(f);
+}
+function buzzPulse(dur){ if(!navigator.vibrate) return; navigator.vibrate([15,120,15,120,15]); }
+
+function enterResult(){
+  show('result');
+  // gauge fill: 92/100 of circumference 553
+  const arc=$('#gaugeArc'); const circ=553; const off=circ*(1-0.92);
+  arc.style.transition='stroke-dashoffset 1s ease'; requestAnimationFrame(()=>arc.style.strokeDashoffset=off);
+  countUp($('#rScore'),0,92,1000);
+  buzz([30,60,30]);
+}
+</script>
+</body>
+</html>
