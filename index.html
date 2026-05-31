@@ -253,6 +253,46 @@ body{
 .field option{background:#0B1020; color:var(--text-hi)}
 .row{display:flex; gap:12px}
 .row .field{flex:1}
+/* バリデーション */
+.field.err input,.field.err select{border-color:var(--neon-red); box-shadow:0 0 0 2px rgba(255,77,109,.22)}
+.field .errmsg{display:none; color:var(--neon-red); font-size:11px}
+.field.err .errmsg{display:block}
+.field.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ════════ 結果:順次フェードイン ════════ */
+#result.active > *{opacity:0; animation:revealUp .55s ease forwards}
+#result.active > *:nth-child(1){animation-delay:.02s}
+#result.active > *:nth-child(2){animation-delay:.12s}
+#result.active > *:nth-child(3){animation-delay:.22s}
+#result.active > *:nth-child(4){animation-delay:.32s}
+#result.active > *:nth-child(5){animation-delay:.42s}
+#result.active > *:nth-child(6){animation-delay:.52s}
+#result.active > *:nth-child(7){animation-delay:.60s}
+@keyframes revealUp{from{opacity:0; transform:translateY(22px)}to{opacity:1; transform:translateY(0)}}
+
+/* グレードDの警告グロー(穏やかに) */
+.gauge.warn::after{content:""; position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
+  border:1px solid rgba(255,77,109,.55); box-shadow:0 0 24px rgba(255,77,109,.3); animation:warnPulse 1.7s ease-out infinite}
+@keyframes warnPulse{0%{transform:scale(1); opacity:.7}100%{transform:scale(1.14); opacity:0}}
+
+/* ════════ 履歴グラフ ════════ */
+#history{padding:26px 22px; gap:18px; overflow-y:auto}
+.h-head{display:flex; align-items:center; gap:10px}
+.h-head .back{width:38px; height:38px; flex:0 0 auto; border-radius:50%; border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-hi); font-size:22px; cursor:pointer}
+.h-head .back:active{transform:scale(.92)}
+.h-title{font-family:"Noto Sans JP"; font-weight:700; font-size:19px}
+.h-title small{display:block; font-size:11px; color:var(--text-low); letter-spacing:.1em; font-family:"Space Grotesk"}
+.range{display:flex; gap:8px}
+.range button{flex:1; padding:9px; border-radius:var(--radius-pill); border:1px solid var(--border-subtle); background:var(--surface-1); color:var(--text-mid); font-family:inherit; font-size:13px; cursor:pointer}
+.range button.on{background:var(--grad-cta); color:#04121a; border:none; font-weight:700; box-shadow:var(--glow-cyan)}
+.chart-card{background:var(--surface-glass); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px 14px; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px)}
+.chart-card .cur{display:flex; align-items:baseline; gap:8px; padding:0 6px 8px}
+.chart-card .cur b{font-family:"Orbitron"; font-size:30px; color:var(--neon-cyan)}
+.chart-card .cur span{font-size:11px; color:var(--text-low); letter-spacing:.1em}
+.badges{display:flex; gap:10px; flex-wrap:wrap}
+.bdg{display:flex; align-items:center; gap:7px; background:var(--surface-1); border:1px solid var(--border-subtle); border-radius:var(--radius-pill); padding:8px 14px; font-size:12px; color:var(--text-mid)}
+.bdg .m{font-size:16px}
 </style>
 </head>
 <body>
@@ -294,9 +334,10 @@ body{
       <input type="file" accept="image/*" onchange="onPhoto(this)" hidden />
     </label>
 
-    <div class="field">
+    <div class="field" id="fldName">
       <label>なまえ</label>
       <input id="fName" type="text" placeholder="例：モカ" maxlength="20" />
+      <span class="errmsg">なまえを入力してください</span>
     </div>
 
     <div class="row">
@@ -309,9 +350,10 @@ body{
       <select id="fBreed"></select>
     </div>
 
-    <div class="field">
+    <div class="field" id="fldWeight">
       <label>いまの体重（kg）</label>
       <input id="fWeight" type="number" step="0.1" min="0" placeholder="例：4.2" inputmode="decimal" />
+      <span class="errmsg">正しい体重を入力してください</span>
     </div>
 
     <button class="cta-lg" onclick="submitProfile()">登録してスキャンへ <span>→</span></button>
@@ -327,9 +369,9 @@ body{
     </div>
     <div class="scan-wrap">
       <button class="scanbtn" onclick="startScan()">SCAN<br>NOW<small>TAP TO SCAN</small></button>
-      <div class="statbar">
-        <div class="stat"><span class="label">前回スコア</span><span class="v">92 <small style="font-size:12px">A+</small></span></div>
-        <div class="stat"><span class="label">連続記録</span><span class="v cyan">🔥 7日</span></div>
+      <div class="statbar" onclick="showHistory()" style="cursor:pointer">
+        <div class="stat"><span class="label">前回スコア</span><span class="v"><span id="homeLast">92</span> <small style="font-size:12px" id="homeLastGr">A+</small></span></div>
+        <div class="stat"><span class="label">健康推移</span><span class="v cyan">📈 ›</span></div>
       </div>
     </div>
   </section>
@@ -402,17 +444,41 @@ body{
     </div>
 
     <div class="r-actions">
-      <button class="btn" onclick="goHome()">履歴</button>
+      <button class="btn" onclick="showHistory()">履歴を見る</button>
       <button class="btn primary" onclick="startScan()">もう一度スキャン</button>
     </div>
     <div class="disclaimer">※本結果は健康管理のための目安です。獣医療・診断ではありません。気になる場合は獣医師にご相談ください。</div>
+  </section>
+
+  <!-- ════════ HISTORY / TREND ════════ -->
+  <section id="history" class="screen">
+    <div class="h-head">
+      <button class="back" onclick="goHome()">‹</button>
+      <div class="h-title" id="hTitle">健康推移 <small>HEALTH TREND</small></div>
+    </div>
+    <div class="range">
+      <button data-r="week" class="on" onclick="setRange('week',this)">週</button>
+      <button data-r="month" onclick="setRange('month',this)">月</button>
+      <button data-r="year" onclick="setRange('year',this)">年</button>
+    </div>
+    <div class="chart-card">
+      <div class="cur"><b id="hCur">92</b><span id="hCurLabel">LATEST HEALTH SCORE</span></div>
+      <svg id="chart" viewBox="0 0 320 180" width="100%" height="180" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="sec-title">獲得バッジ</div>
+    <div class="badges">
+      <div class="bdg"><span class="m">🔥</span>7日連続スキャン</div>
+      <div class="bdg"><span class="m">🏅</span>スコア90超</div>
+      <div class="bdg"><span class="m">⭐</span>ヘルスLv.4</div>
+    </div>
+    <button class="cta-lg" style="align-self:center" onclick="startScan()">スキャンする <span>→</span></button>
   </section>
 
 </div>
 
 <script>
 const $ = s => document.querySelector(s);
-const screens = {splash:$('#splash'), profile:$('#profile'), home:$('#home'), scan:$('#scan'), result:$('#result')};
+const screens = {splash:$('#splash'), profile:$('#profile'), home:$('#home'), scan:$('#scan'), result:$('#result'), history:$('#history')};
 function show(name){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[name].classList.add('active'); if(screens[name].scrollTo) screens[name].scrollTop=0; }
 function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -477,12 +543,22 @@ function onPhoto(input){
   pet.photo=URL.createObjectURL(f);
   const pv=$('#photoPrev'); pv.innerHTML=''; const im=new Image(); im.src=pet.photo; pv.appendChild(im);
 }
+function fieldError(fldId, on){
+  const f=$('#'+fldId); f.classList.toggle('err', on);
+  if(on){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); }
+}
 function submitProfile(){
-  pet.name   = ($('#fName').value||'').trim() || 'この子';
+  const name=($('#fName').value||'').trim();
+  const w=parseFloat($('#fWeight').value);
+  let ok=true;
+  if(!name){ fieldError('fldName', true); ok=false; } else fieldError('fldName', false);
+  if(!(w>0 && w<120)){ fieldError('fldWeight', true); ok=false; } else fieldError('fldWeight', false);
+  if(!ok){ buzz([40,60,40]); return; }   // バリデーション失敗
+  pet.name   = name;
   pet.breed  = $('#fBreed').value;
   pet.birthY = +$('#fYear').value;
   pet.birthM = +$('#fMonth').value;
-  pet.weight = parseFloat($('#fWeight').value) || pet.weight;
+  pet.weight = w;
   applyPet();
   show('home');
 }
@@ -617,6 +693,7 @@ function enterResult(){
   ['#rScore','#rGrade'].forEach(s=>{ $(s).style.color=th.c; $(s).style.textShadow=th.glow; });
   $('#rGrade').textContent = gr.g;
   const cond=$('#rCond'); cond.textContent = gr.cond; cond.style.color=th.c;
+  document.querySelector('.gauge').classList.toggle('warn', gr.g==='D');   // D=警告グロー
 
   // ── 各項目スコア＆レベルバッジ ──
   [['#scBody','#lvBody',r.body],['#scTear','#lvTear',r.tear],['#scCoat','#lvCoat',r.coat]].forEach(([sc,lv,v])=>{
@@ -633,6 +710,10 @@ function enterResult(){
   arc.style.strokeDashoffset=circ;
   arc.style.transition='stroke-dashoffset 1s ease'; requestAnimationFrame(()=>arc.style.strokeDashoffset=off);
   countUp($('#rScore'),0,r.overall,1000);
+
+  // 履歴に記録 + ホームの前回スコア更新
+  histData.week.push(r.overall); if(histData.week.length>9) histData.week.shift();
+  $('#homeLast').textContent = r.overall; $('#homeLastGr').textContent = gr.g;
 
   particleBurst(th.c, th.c2);
   buzz([30,60,30]);
@@ -652,6 +733,43 @@ function particleBurst(c1,c2){
     setTimeout(()=>{ p.style.transform=`translate(${Math.cos(a)*d}px, ${Math.sin(a)*d}px) scale(0)`; p.style.opacity='0'; }, dly);
     setTimeout(()=>p.remove(), 1000+dly);
   }
+}
+
+/* ════════ 履歴グラフ ════════ */
+const histData = {
+  week: [78,82,80,85,88,84,90,92],
+  month:[74,79,83,86,88,90,92],
+  year: [68,71,73,77,80,82,84,86,88,90,91,92]
+};
+const RANGE_LABEL = { week:'WEEKLY', month:'MONTHLY', year:'YEARLY' };
+let curRange = 'week';
+function showHistory(){
+  $('#hTitle').innerHTML = pet.name + ' の健康推移 <small>HEALTH TREND</small>';
+  show('history');
+  setRange(curRange, document.querySelector('.range button[data-r="'+curRange+'"]'));
+}
+function setRange(r, btn){
+  curRange=r;
+  document.querySelectorAll('.range button').forEach(b=>b.classList.toggle('on', b===btn));
+  const data=histData[r];
+  drawChart(data);
+  $('#hCur').textContent = data[data.length-1];
+  $('#hCurLabel').textContent = RANGE_LABEL[r] + ' · LATEST';
+}
+function drawChart(data){
+  const svg=$('#chart'); const W=320,H=180, pl=16, pr=16, pt=18, pb=22;
+  const n=data.length, min=Math.min(...data)-6, max=Math.max(...data)+4;
+  const xs=i=> pl + (W-pl-pr)*(n===1?0.5:i/(n-1));
+  const ys=v=> pt + (H-pt-pb)*(1-(v-min)/((max-min)||1));
+  let line=''; data.forEach((v,i)=>{ line+=(i?'L':'M')+xs(i).toFixed(1)+' '+ys(v).toFixed(1)+' '; });
+  const area = line + 'L'+xs(n-1).toFixed(1)+' '+(H-pb)+' L'+xs(0).toFixed(1)+' '+(H-pb)+' Z';
+  let dots=''; data.forEach((v,i)=>{ const last=i===n-1; dots+=`<circle cx="${xs(i).toFixed(1)}" cy="${ys(v).toFixed(1)}" r="${last?4.2:2.6}" fill="${last?'#36F1B3':'#27E1FF'}"/>`; });
+  let grid=''; for(let g=0; g<=3; g++){ const y=(pt+(H-pt-pb)*g/3).toFixed(1); grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="rgba(255,255,255,.06)"/>`; }
+  svg.innerHTML = `<defs><linearGradient id="harea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(39,225,255,.32)"/><stop offset="1" stop-color="rgba(39,225,255,0)"/></linearGradient></defs>`
+    + grid
+    + `<path d="${area}" fill="url(#harea)"/>`
+    + `<path d="${line}" fill="none" stroke="#27E1FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(39,225,255,.6))"/>`
+    + dots;
 }
 
 /* ── 初期化 ── */
