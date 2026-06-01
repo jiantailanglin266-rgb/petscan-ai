@@ -764,9 +764,11 @@ function buildShareText(s){
   const rareTag = s.rarity==='legend'?' #激レア称号' : s.rarity==='rare'?' #レア称号':'';
   const extra = s.delta>1 ? '#若見え' : s.overall>=85 ? '#すこやか自慢' : (s.species==='cat'?'#猫のいる暮らし':'#犬のいる暮らし');
   const tmpls=[
-    `うちの子${b}、健康年齢${s.healthAge}歳でした✨ 実年齢より${s.deltaShort}、称号は「${s.title}」🏅`,
-    `AIにうちの子${b}を診てもらったら健康年齢${s.healthAge}歳😳 称号「${s.title}」もらった（${s.deltaShort}だって）`,
-    `今日もこの子${b}が元気でなにより🐾 健康年齢${s.healthAge}歳、「${s.title}」をいただきました。ずっと健康でいてね`,
+    `うちの子${b}、健康年齢${s.healthAge}歳でした✨ 実年齢より${s.deltaShort}、称号は「${s.title}」🏅`,            // 自慢系
+    `AIにうちの子${b}を診てもらったら健康年齢${s.healthAge}歳😳 称号「${s.title}」もらった（${s.deltaShort}だって）`, // ツッコミ系
+    `今日もこの子${b}が元気でなにより🐾 健康年齢${s.healthAge}歳、「${s.title}」をいただきました。ずっと健康でいてね`,   // エモ系
+    `「${s.title}」獲得✌️ うちの子${b}の健康年齢は${s.healthAge}歳（${s.deltaShort}）でした`,                       // 自慢系2
+    `うちの子${b}を診断したら「${s.title}」だった☺️ 健康年齢${s.healthAge}歳、これからも大切にするね🐾`,             // エモ系2
   ];
   const t=tmpls[Math.floor(Math.random()*tmpls.length)];
   return `${t}\n#MOFURI #うちの子健康診断 ${extra}${rareTag}`;
