@@ -81,8 +81,17 @@ img{display:block; max-width:100%}
 /* ── WIZARD ── */
 .wizard{background:linear-gradient(180deg,var(--bg2),var(--bg)); border-top:1px solid var(--line2); padding:42px 0 30px}
 .wizard .wrap{max-width:980px}
+.sections{display:flex; align-items:center; justify-content:center; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.sections .seg{font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--text-low); padding:5px 12px; border-radius:var(--r-pill); border:1px solid var(--line2); background:var(--card); white-space:nowrap; display:inline-flex; align-items:center; gap:6px; transition:.2s}
+.sections .seg::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--text-low); flex:0 0 auto}
+.sections .seg.active{color:var(--accent2); border-color:var(--accent); background:rgba(244,163,64,.1); box-shadow:var(--glow)}
+.sections .seg.active::before{background:var(--accent)}
+.sections .seg.done{color:var(--good); border-color:rgba(95,208,160,.35)}
+.sections .seg.done::before{content:'✓'; background:transparent; width:auto; height:auto; color:var(--good); font-size:10px; line-height:1}
+.seg-sep{color:var(--text-low); font-size:11px}
 .step-ind{text-align:center; font-family:"Space Grotesk"; letter-spacing:.22em; font-size:12px; color:var(--accent); font-weight:700}
 .step-ind b{font-size:13px}
+.step-ind .remain{display:inline-block; margin-left:8px; padding:2px 9px; border-radius:var(--r-pill); background:rgba(244,163,64,.14); color:var(--accent2); font-family:"Noto Sans JP",sans-serif; letter-spacing:.02em; font-size:11px}
 .wiz-title{text-align:center; font-size:clamp(20px,3vw,27px); font-weight:900; margin-top:12px}
 .wiz-sub{text-align:center; color:var(--text-mid); font-size:13.5px; margin-top:8px}
 .wiz-body{margin-top:30px; min-height:140px}
@@ -293,7 +302,12 @@ img{display:block; max-width:100%}
     <!-- WIZARD -->
     <section class="wizard" id="wizardSec">
       <div class="wrap">
-        <div class="step-ind">STEP <b id="stepNum">1</b> / <b id="stepTotal">11</b></div>
+        <div class="sections" id="sections">
+          <span class="seg">基本</span><span class="seg-sep">›</span>
+          <span class="seg">生活</span><span class="seg-sep">›</span>
+          <span class="seg">健康チェック</span>
+        </div>
+        <div class="step-ind">STEP <b id="stepNum">1</b> / <b id="stepTotal">25</b> <span class="remain" id="remain"></span></div>
         <h2 class="wiz-title" id="wizTitle">ペットの種類を選択してください</h2>
         <p class="wiz-sub" id="wizSub">診断の精度を高めるために、まずはペットの種類を教えてください。</p>
         <div class="wiz-body" id="wizBody"></div>
@@ -504,6 +518,15 @@ const STEPS=[
   {k:'photo',   type:'photo', t:'お写真をアップロード', s:'顔がはっきり写った写真だと精度が上がります（ドラッグ＆ドロップ対応）。'},
 ];
 const TOTAL=STEPS.length;
+// 達成感のためのセクション分け(基本→生活→健康チェック)
+const SECTIONS=[ {name:'基本', from:1, to:7}, {name:'生活', from:8, to:17}, {name:'健康チェック', from:18, to:25} ];
+const sectionIndex = st => SECTIONS.findIndex(s=> st>=s.from && st<=s.to);
+function updateSections(){
+  const si=sectionIndex(step);
+  document.querySelectorAll('#sections .seg').forEach((el,i)=>{ el.classList.toggle('active', i===si); el.classList.toggle('done', i<si); });
+  const remain=TOTAL-step;  // 現ステップ以降に残る数
+  const r=$('#remain'); if(r) r.textContent = remain>0 ? `あと${remain}問` : 'ラスト！';
+}
 function grid(items){ return `<div class="opt-grid auto" role="radiogroup">`+items.join('')+`</div>`; }
 function actKey(e,fn){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(); } }
 function card(key,label){ const v=label.replace(/'/g,"\\'"); const sel=wiz[key]===label;
@@ -512,6 +535,7 @@ function card(key,label){ const v=label.replace(/'/g,"\\'"); const sel=wiz[key]=
 function renderStep(){
   const cfg=STEPS[step-1];
   $('#stepNum').textContent=step; $('#stepTotal').textContent=TOTAL; $('#wizPage').textContent=step+' / '+TOTAL; $('#wizProg').style.width=(step/TOTAL*100)+'%';
+  updateSections();
   $('#wizTitle').textContent= typeof cfg.t==='function'?cfg.t():cfg.t;
   $('#wizSub').textContent= typeof cfg.s==='function'?cfg.s():cfg.s;
   const back = step>1 ? '<button class="backbtn" onclick="prevStep()">‹ 戻る</button>' : '';
