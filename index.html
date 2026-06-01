@@ -10,17 +10,20 @@
 <meta property="og:site_name" content="MOFURI." />
 <meta property="og:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta property="og:description" content="犬・猫対応。30秒で無料診断。AIが体・目元・口元・毛並み・皮膚の5観点でスコア化。" />
-<meta property="og:image" content="https://place.dog/1200/630" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="MOFURI. — 写真1枚で、うちの子の健康年齢をAI分析" />
+<meta property="og:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/assets/mofuri-hero.png" />
+<meta property="og:image:width" content="1682" />
+<meta property="og:image:height" content="935" />
+<meta property="og:image:alt" content="MOFURI. — 写真1枚で、うちの子の健康年齢をAI診断" />
 <meta property="og:url" content="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
 <meta property="og:locale" content="ja_JP" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta name="twitter:description" content="犬・猫対応。30秒で無料診断。" />
-<meta name="twitter:image" content="https://place.dog/1200/630" />
+<meta name="twitter:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/assets/mofuri-hero.png" />
 <link rel="canonical" href="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
+<!-- LCP: ヒーロー画像を media 付きで preload -->
+<link rel="preload" as="image" href="assets/mofuri-hero.webp" media="(min-width:769px)" />
+<link rel="preload" as="image" href="assets/mofuri-hero-mobile.webp" media="(max-width:768px)" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l14 14-14 14L2 16z' fill='%23F4A340'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -65,29 +68,15 @@ img{display:block; max-width:100%}
 .sound-toggle.off{opacity:.5}
 
 /* ── HERO ── */
+/* ── HERO（PC横長 / スマホ縦長を picture で出し分け・画像1枚主役）── */
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
 .hero{position:relative; overflow:hidden}
-.hero .wrap{display:grid; grid-template-columns:1.05fr .95fr; gap:30px; align-items:center; padding-top:54px; padding-bottom:46px}
-.hero-media{position:relative; height:440px; border-radius:var(--r-lg); overflow:hidden}
-.hero-media img{width:100%; height:100%; object-fit:cover}
-.hero-media .fb{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:140px; background:radial-gradient(120% 120% at 70% 30%, #2a1c0c, #0a0805)}
-.hero-media::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, var(--bg) 0%, transparent 22%), radial-gradient(80% 90% at 80% 20%, rgba(244,163,64,.14), transparent 60%)}
-.hero-deco{position:absolute; top:18px; right:18px; width:230px; height:160px; opacity:.55; pointer-events:none; z-index:2}
-.hero-teaser{position:absolute; left:16px; bottom:16px; z-index:3; padding:12px 16px; border-radius:var(--r-md); background:rgba(10,10,10,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid var(--line)}
-.hero-teaser .tlab{font-size:10px; letter-spacing:.12em; color:var(--text-low)}
-.hero-teaser .trow{font-size:14px; font-weight:600; margin-top:3px; color:var(--text-mid)}
-.hero-teaser .trow b{color:var(--accent); font-family:"Space Grotesk",sans-serif}
-.hero-teaser .trow .ar{color:var(--accent)}
-.hero-teaser .tdelta{display:inline-block; margin-top:5px; font-size:12px; font-weight:800; color:var(--good)}
-.hero h1{font-size:clamp(30px,4.4vw,50px); font-weight:900; line-height:1.22; letter-spacing:.01em}
-.hero .lead{color:var(--text-mid); margin-top:18px; font-size:15px; max-width:30em}
-.hero .badge-row{display:inline-flex; gap:8px; margin-bottom:20px; flex-wrap:wrap}
-.pill{font-size:12px; color:var(--accent2); border:1px solid var(--line); background:rgba(244,163,64,.07); padding:6px 13px; border-radius:var(--r-pill); font-weight:700}
-.features{display:flex; gap:26px; margin-top:30px; flex-wrap:wrap}
-.feat{max-width:170px}
-.feat .ic{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(244,163,64,.08);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:9px}
-.feat .ic svg{width:19px;height:19px}
-.feat h4{font-size:13.5px; font-weight:700}
-.feat p{font-size:11.5px; color:var(--text-low); margin-top:3px; line-height:1.5}
+.hero-inner{display:flex; flex-direction:column; align-items:center; gap:20px; padding-top:32px; padding-bottom:34px}
+.hero-img{position:relative; display:block; width:100%; max-width:980px; border-radius:var(--r-lg); overflow:hidden; aspect-ratio:1682/935; background:radial-gradient(120% 120% at 75% 25%, #2a1c0c, #0a0805); box-shadow:var(--shadow-card); border:1px solid var(--line2)}
+.hero-img img{width:100%; height:100%; object-fit:cover; display:block}
+.hero-img.img-missing img{display:none}
+.hero-img.img-missing::after{content:"🐾 MOFURI."; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--accent); font-family:"Inter",sans-serif; font-weight:800; font-size:clamp(22px,4vw,34px); letter-spacing:.12em}
+.hero-cta{width:100%; max-width:360px; margin-top:2px}
 
 /* ── WIZARD ── */
 .wizard{background:linear-gradient(180deg,var(--bg2),var(--bg)); border-top:1px solid var(--line2); padding:42px 0 30px}
@@ -264,9 +253,8 @@ img{display:block; max-width:100%}
 .disclaimer{font-size:10px;color:var(--text-low);text-align:center;line-height:1.7;margin-top:22px;padding:0 12px}
 
 @media(max-width:860px){
-  .hero .wrap{grid-template-columns:1fr;padding-top:30px}
-  .hero-media{order:-1;height:240px}
-  .hero-deco{width:150px;height:110px}
+  .hero-inner{padding-top:20px}
+  .hero-img{aspect-ratio:1080/1440; max-width:520px}
   .opt-grid.c2,.opt-grid.c4{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr 1fr}
   .agehero .blk.main .num{font-size:52px}
@@ -285,30 +273,20 @@ img{display:block; max-width:100%}
       </div>
     </header>
 
-    <!-- HERO -->
+    <!-- HERO：画像1枚を主役に。PC横長 / スマホ縦長を picture で出し分け -->
     <section class="hero">
-      <div class="wrap">
-        <div class="hero-text">
-          <span class="logo" id="heroLogo" style="margin-bottom:24px"></span>
-          <div class="badge-row"><span class="pill">犬・猫対応</span><span class="pill">30秒で無料診断</span></div>
-          <h1>写真1枚で、<br>うちの子の<span style="color:var(--accent)">健康年齢</span>を<br>AI診断。</h1>
-          <p class="lead">MOFURI.は写真といくつかの情報から、愛犬・愛猫の健康状態をAIがスコア化するサービスです。</p>
-          <div class="features">
-            <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h4>AI健康スコア</h4><p>独自のAIが総合スコアを算出</p></div>
-            <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 4 4 8-8"/><path d="M17 4h4v4"/></svg></div><h4>5つの観点で分析</h4><p>体・目元・口元・毛並み・皮膚</p></div>
-            <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div><h4>プライバシー安心</h4><p>データは安全に保護されます</p></div>
-          </div>
-        </div>
-        <div class="hero-media">
-          <img src="https://place.dog/900/820" alt="健康そうな犬と猫" width="900" height="820" fetchpriority="high" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-          <div class="fb" style="display:none">🐾</div>
-          <svg class="hero-deco" viewBox="0 0 230 160" fill="none" id="heroDeco"></svg>
-          <div class="hero-teaser">
-            <span class="tlab">診断結果イメージ</span>
-            <div class="trow">実年齢 8歳 <span class="ar">→</span> <b>健康年齢 5.6歳</b></div>
-            <span class="tdelta">−2.4歳 若見え ✨</span>
-          </div>
-        </div>
+      <div class="wrap hero-inner">
+        <h1 class="sr-only">写真1枚で、うちの子の健康年齢をAI診断 | MOFURI.</h1>
+        <picture class="hero-img">
+          <source media="(max-width:768px)" srcset="assets/mofuri-hero-mobile.webp" type="image/webp">
+          <source media="(max-width:768px)" srcset="assets/mofuri-hero-mobile.png">
+          <source srcset="assets/mofuri-hero.webp" type="image/webp">
+          <img src="assets/mofuri-hero.png"
+               alt="写真1枚で、うちの子の健康年齢をAI診断 — 犬・猫対応、30秒で無料診断。MOFURI."
+               fetchpriority="high" decoding="async"
+               onerror="this.closest('.hero-img').classList.add('img-missing')">
+        </picture>
+        <button class="cta hero-cta" onclick="document.querySelector('#wizardSec').scrollIntoView({behavior:'smooth'})">無料で診断をはじめる →</button>
       </div>
     </section>
 
@@ -446,13 +424,7 @@ const SHARE_LABEL = 'mofuri.net';                          // 画像に焼き込
 const MARK = '<svg viewBox="0 0 32 32" fill="none"><path d="M16 2l14 14-14 14L2 16z" stroke="#F4A340" stroke-width="2.4"/><path d="M16 9l7 7-7 7-7-7z" fill="#F4A340"/></svg>';
 function paintLogos(){
   const html = '<span class="mark">'+MARK+'</span><span class="wm">MOFUR<b>I.</b></span>';
-  ['#navLogo','#heroLogo','#scLogo'].forEach(s=>{ const el=$(s); if(el) el.innerHTML=html; });
-  // hero deco: ネットワーク風ドット
-  const deco=$('#heroDeco'); if(deco){ let n=''; const pts=[[20,30],[90,15],[170,40],[210,90],[140,80],[60,100],[110,130],[200,140]];
-    pts.forEach((p,i)=>{ if(i){const q=pts[i-1]; n+=`<line x1="${q[0]}" y1="${q[1]}" x2="${p[0]}" y2="${p[1]}" stroke="#F4A340" stroke-width="1" opacity=".5"/>`;} });
-    pts.forEach(p=> n+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#F4A340"/>`);
-    deco.innerHTML=n;
-  }
+  ['#navLogo','#scLogo'].forEach(s=>{ const el=$(s); if(el) el.innerHTML=html; });
 }
 
 /* ── サウンド(Web Audio) ── */
