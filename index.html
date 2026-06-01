@@ -21,9 +21,8 @@
 <meta name="twitter:description" content="犬・猫対応。30秒で無料診断。" />
 <meta name="twitter:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/assets/mofuri-hero.png" />
 <link rel="canonical" href="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
-<!-- LCP: ヒーロー画像を media 付きで preload -->
-<link rel="preload" as="image" href="assets/mofuri-hero.webp" media="(min-width:769px)" />
-<link rel="preload" as="image" href="assets/mofuri-hero-mobile.webp" media="(max-width:768px)" />
+<!-- LCP: ヒーロー画像を preload -->
+<link rel="preload" as="image" href="assets/mofuri-hero.webp" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l14 14-14 14L2 16z' fill='%23F4A340'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -254,7 +253,6 @@ img{display:block; max-width:100%}
 
 @media(max-width:860px){
   .hero-inner{padding-top:20px}
-  .hero-img{aspect-ratio:1080/1440; max-width:520px}
   .opt-grid.c2,.opt-grid.c4{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr 1fr}
   .agehero .blk.main .num{font-size:52px}
@@ -278,8 +276,6 @@ img{display:block; max-width:100%}
       <div class="wrap hero-inner">
         <h1 class="sr-only">写真1枚で、うちの子の健康年齢をAI診断 | MOFURI.</h1>
         <picture class="hero-img">
-          <source media="(max-width:768px)" srcset="assets/mofuri-hero-mobile.webp" type="image/webp">
-          <source media="(max-width:768px)" srcset="assets/mofuri-hero-mobile.png">
           <source srcset="assets/mofuri-hero.webp" type="image/webp">
           <img src="assets/mofuri-hero.png"
                alt="写真1枚で、うちの子の健康年齢をAI診断 — 犬・猫対応、30秒で無料診断。MOFURI."
