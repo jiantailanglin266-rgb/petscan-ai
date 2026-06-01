@@ -72,6 +72,12 @@ img{display:block; max-width:100%}
 .hero-media .fb{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:140px; background:radial-gradient(120% 120% at 70% 30%, #2a1c0c, #0a0805)}
 .hero-media::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, var(--bg) 0%, transparent 22%), radial-gradient(80% 90% at 80% 20%, rgba(244,163,64,.14), transparent 60%)}
 .hero-deco{position:absolute; top:18px; right:18px; width:230px; height:160px; opacity:.55; pointer-events:none; z-index:2}
+.hero-teaser{position:absolute; left:16px; bottom:16px; z-index:3; padding:12px 16px; border-radius:var(--r-md); background:rgba(10,10,10,.62); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid var(--line)}
+.hero-teaser .tlab{font-size:10px; letter-spacing:.12em; color:var(--text-low)}
+.hero-teaser .trow{font-size:14px; font-weight:600; margin-top:3px; color:var(--text-mid)}
+.hero-teaser .trow b{color:var(--accent); font-family:"Space Grotesk",sans-serif}
+.hero-teaser .trow .ar{color:var(--accent)}
+.hero-teaser .tdelta{display:inline-block; margin-top:5px; font-size:12px; font-weight:800; color:var(--good)}
 .hero h1{font-size:clamp(30px,4.4vw,50px); font-weight:900; line-height:1.22; letter-spacing:.01em}
 .hero .lead{color:var(--text-mid); margin-top:18px; font-size:15px; max-width:30em}
 .hero .badge-row{display:inline-flex; gap:8px; margin-bottom:20px; flex-wrap:wrap}
@@ -175,6 +181,10 @@ img{display:block; max-width:100%}
 .r-title{font-family:"Space Grotesk";letter-spacing:.2em;font-size:12px;color:var(--text-mid);text-transform:uppercase}
 .titlebadge{display:inline-flex;align-items:center;gap:9px;margin:16px 0 6px;padding:9px 20px;border-radius:var(--r-pill);border:1px solid var(--accent);background:rgba(244,163,64,.1);box-shadow:var(--glow);font-weight:800;font-size:16px;color:var(--accent2)}
 .titlebadge .em{font-size:20px}
+.rare-badge{display:inline-block;margin-top:8px;padding:5px 14px;border-radius:var(--r-pill);font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:11px;letter-spacing:.16em}
+.rare-badge.rare{color:#FFF6E0;background:linear-gradient(135deg,rgba(244,163,64,.25),rgba(244,163,64,.08));border:1px solid var(--accent);box-shadow:var(--glow)}
+.rare-badge.legend{color:#0A0A0A;background:linear-gradient(135deg,#FFE9B0,#F4A340);border:1px solid #FFF6E0;box-shadow:0 0 26px rgba(244,163,64,.7);animation:legendPulse 1.4s ease-in-out infinite}
+@keyframes legendPulse{0%,100%{box-shadow:0 0 18px rgba(244,163,64,.6)}50%{box-shadow:0 0 34px rgba(244,163,64,.95)}}
 .r-meta{font-size:12.5px;color:var(--text-mid);margin-top:8px}
 .r-meta b{color:var(--text-hi);font-weight:700}
 
@@ -248,8 +258,9 @@ img{display:block; max-width:100%}
 .referral h3{font-size:18px;font-weight:900}
 .referral p{color:var(--text-mid);font-size:13px;margin-top:8px}
 .referral .cta{max-width:320px;margin:18px auto 0}
-.ref-again{display:block;margin:14px auto 0;background:none;border:none;color:var(--text-mid);font-family:inherit;font-size:13px;cursor:pointer}
-.ref-again:hover{color:var(--accent)}
+.ref-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.ref-again{background:var(--card);border:1px solid var(--line2);border-radius:var(--r-pill);color:var(--text-mid);font-family:inherit;font-size:13px;cursor:pointer;padding:10px 16px}
+.ref-again:hover{color:var(--accent);border-color:var(--line)}
 .disclaimer{font-size:10px;color:var(--text-low);text-align:center;line-height:1.7;margin-top:22px;padding:0 12px}
 
 @media(max-width:860px){
@@ -292,6 +303,11 @@ img{display:block; max-width:100%}
           <img src="https://place.dog/900/820" alt="健康そうな犬と猫" width="900" height="820" fetchpriority="high" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="fb" style="display:none">🐾</div>
           <svg class="hero-deco" viewBox="0 0 230 160" fill="none" id="heroDeco"></svg>
+          <div class="hero-teaser">
+            <span class="tlab">診断結果イメージ</span>
+            <div class="trow">実年齢 8歳 <span class="ar">→</span> <b>健康年齢 5.6歳</b></div>
+            <span class="tdelta">−2.4歳 若見え ✨</span>
+          </div>
         </div>
       </div>
     </section>
@@ -339,6 +355,7 @@ img{display:block; max-width:100%}
       <div class="wrap">
         <div class="r-title">AI Health Report</div>
         <div class="titlebadge"><span class="em" id="rTitleEm">👑</span><span id="rTitle">健康王</span></div>
+        <div class="rare-badge" id="rRare" hidden></div>
         <div class="r-meta" id="rMeta"></div>
         <div class="agehero">
           <div class="row">
@@ -406,7 +423,10 @@ img{display:block; max-width:100%}
         <h3>友達の子の健康年齢も、気になりませんか？</h3>
         <p>結果をシェアして、友達のペットも診断してあげよう。</p>
         <button class="cta" onclick="shareX()">シェアして広める 🐾</button>
-        <button class="ref-again" onclick="restart()">別の写真でもう一度診断する ›</button>
+        <div class="ref-links">
+          <button class="ref-again" onclick="restart()">👯 兄弟の子も診断する</button>
+          <button class="ref-again" onclick="restart()">📷 別の写真でもう一度</button>
+        </div>
       </div>
       <div class="disclaimer">※本結果は健康管理のための目安であり、獣医療・診断ではありません。気になる場合は獣医師にご相談ください。スコア等はデモ用の参考値です。</div>
     </div>
@@ -418,6 +438,9 @@ img{display:block; max-width:100%}
 const $ = s => document.querySelector(s);
 const buzz = p => navigator.vibrate && navigator.vibrate(p);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ── シェア設定（本番ドメイン確定時はここだけ差し替え）── */
+const SHARE_URL   = location.origin + location.pathname;  // 実際のシェアリンク
+const SHARE_LABEL = 'mofuri.net';                          // 画像に焼き込む表示用ラベル
 
 /* ── MOFURI ロゴ描画 ── */
 const MARK = '<svg viewBox="0 0 32 32" fill="none"><path d="M16 2l14 14-14 14L2 16z" stroke="#F4A340" stroke-width="2.4"/><path d="M16 9l7 7-7 7-7-7z" fill="#F4A340"/></svg>';
@@ -585,12 +608,26 @@ function gradeTheme(o){
   if(o>=60) return {c:'#F2C14E',cond:'標準的なコンディションです'};
   return {c:'#E8635F',cond:'いくつか気になる観点があります'};
 }
+// 称号:スコア帯×種別/性別/気になること＋乱数。レア/レジェンドを低確率で混ぜる
 function titleOf(o){
-  if(o>=90) return ['👑','健康王'];
-  if(o>=85) return ['✨','若見えマスター'];
-  if(o>=78) return ['🧸','もふもふエリート'];
-  if(o>=70) return ['👑','毛並みプリンセス'];
-  return ['🛡️','涙やけガーディアン'];
+  const sp=wiz.species, cz=wiz.concerns||[];
+  const pickFrom=(arr,rarity)=>{ const a=arr[Math.floor(Math.random()*arr.length)]; return {em:a[0],title:a[1],rarity}; };
+  const r=Math.random();
+  const legendCh = o>=88?0.06 : o>=80?0.03 : 0.012;
+  const rareCh   = o>=80?0.12 : o>=70?0.08 : 0.04;
+  if(r<legendCh)          return pickFrom([['🌈','奇跡のもふもふ'],['🐉','伝説のツヤ毛皇帝'],['🏆','黄金比ボディ']],'legend');
+  if(r<legendCh+rareCh)   return pickFrom([['💎','ダイヤ級コンディション'],['🔥','エナジー絶好調'],['🌟','きらめきオーラ持ち']],'rare');
+  let pool;
+  if(o>=88)      pool=[['👑','健康王'],['✨','若見えマスター'],['😇','すこやか天使']];
+  else if(o>=80) pool=[['🧸','もふもふ番長'],['🧸','もふもふエリート'],['💛','きらめき美人']];
+  else if(o>=72) pool=[['👑','毛並みプリンセス'],['🧘','バランス賢者'],['🌱','のびしろ星人']];
+  else if(o>=64) pool=[['🌿','マイペース仙人'],['🐾','がんばり屋さん'],['🔰','すくすくケア中']];
+  else           pool=[['🛡️','涙やけガーディアン'],['😴','おやすみ番長'],['🔰','ケア見習い']];
+  if(cz.includes('毛並み・抜け毛') && o>=72) pool.push(['🧹','抜け毛ハンター']);
+  if(cz.includes('涙やけ'))                  pool.push(['🛡️','涙やけガーディアン']);
+  if(sp==='cat')                            pool.push(['🐈','気まぐれニャスター']);
+  if(sp==='dog' && o>=80)                    pool.push(['🐕','元気いっぱい大使']);
+  return pickFrom(pool,'normal');
 }
 function storyOf(o){
   if(o>=80) return 'この子は同年代平均よりも非常に良好なコンディションです。毛並みの状態も優秀で、健康的な生活習慣が維持できています。今後も現在のケアを続けることで、若々しい状態を保てるでしょう。';
@@ -632,7 +669,8 @@ function startScan(){
 
 /* ── 結果描画 ── */
 function enterResult(){
-  const r=result, gt=gradeTheme(r.overall), [em,title]=titleOf(r.overall);
+  const r=result, gt=gradeTheme(r.overall), tt=titleOf(r.overall);
+  const em=tt.em, title=tt.title, rarity=tt.rarity;
   const realAge = wiz.ageRep||8;
   const ratio = 1 - (r.overall-68)*0.008;                 // 高スコアほど若く・実年齢に比例
   const healthAge = Math.max(0.3, Math.round(realAge*ratio*10)/10);
@@ -642,6 +680,9 @@ function enterResult(){
   const sp = wiz.species==='cat'?'猫':'犬';
 
   $('#rTitleEm').textContent=em; $('#rTitle').textContent=title;
+  const rb=$('#rRare');
+  if(rarity==='normal'){ rb.hidden=true; rb.className='rare-badge'; }
+  else { rb.hidden=false; rb.className='rare-badge '+rarity; rb.textContent = rarity==='legend'?'★ LEGEND 称号 ★':'✦ RARE 称号 ✦'; }
   $('#rMeta').innerHTML=`<b>${wiz.breed||(sp+'種')}</b>　${realAge}歳　${wiz.sex||'性別不明'}`;
   $('#rRealAge').textContent=realAge+'歳'; $('#rHealthAge').textContent=healthAge+'歳';
   const youthful=delta>0.05, aged=delta<-0.05;
@@ -670,44 +711,79 @@ function enterResult(){
   $('#scHealth').textContent=healthAge; $('#scHealth2').textContent=healthAge; $('#scReal').textContent=realAge;
   const scD=$('#scDelta'); scD.textContent=deltaShort; scD.style.color=deltaColor;
   $('#scTitle').textContent=`${em} ${title}`;
-  window._share={healthAge,realAge,delta,deltaShort,title,em,overall:r.overall,breed:wiz.breed};
+  window._share={healthAge,realAge,delta,deltaShort,title,em,rarity,overall:r.overall,breed:wiz.breed,species:wiz.species,sex:wiz.sex};
+  window._share.text=buildShareText(window._share);
 
   showView('result'); window.scrollTo(0,0);
   requestAnimationFrame(()=>{ arc.style.strokeDashoffset=circ*(1-r.overall/100); });
   countUp($('#gScore'),r.overall,1000);
-  particleBurst(gt.c);
+  particleBurst(gt.c, rarity);
   buzz([30,60,30]);
 }
 function countUp(el,to,dur){const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.textContent=Math.round(to*k);if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);}
-function particleBurst(col){ if(reduce)return; const host=$('#burst'); host.innerHTML='';
-  for(let i=0;i<26;i++){const p=document.createElement('span');p.className='p';p.style.background=col;p.style.boxShadow='0 0 8px '+col;host.appendChild(p);
-    const a=Math.random()*6.28,d=60+Math.random()*120,dl=Math.random()*120;
+function particleBurst(col, rarity){ if(reduce)return; const host=$('#burst'); host.innerHTML='';
+  const N = rarity==='legend'?64 : rarity==='rare'?44 : 26;
+  const cols = rarity==='legend'?['#F4A340','#FFF6E0','#5FD0A0'] : rarity==='rare'?['#F4A340','#FFF6E0'] : [col];
+  const maxD = rarity==='legend'?190 : rarity==='rare'?160 : 120;
+  for(let i=0;i<N;i++){const c=cols[i%cols.length];const p=document.createElement('span');p.className='p';p.style.background=c;p.style.boxShadow='0 0 8px '+c;host.appendChild(p);
+    const a=Math.random()*6.28,d=60+Math.random()*maxD,dl=Math.random()*(rarity==='normal'?120:200);
     setTimeout(()=>{p.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(0)`;p.style.opacity='0';},dl);
-    setTimeout(()=>p.remove(),1000+dl);
+    setTimeout(()=>p.remove(),1200+dl);
   }
 }
 
 /* ── シェア ── */
-function shareText(){ const s=window._share||{}; const b=s.breed?`(${s.breed})`:''; return `うちの子${b}の健康年齢は${s.healthAge}歳！(実年齢${s.realAge}歳) 称号「${s.title}」をゲット🐾 #MOFURI #うちの子健康診断`; }
-function shareX(){ const u=encodeURIComponent(location.href); const t=encodeURIComponent(shareText()); window.open(`https://twitter.com/intent/tweet?text=${t}&url=${u}`,'_blank'); }
-function shareLine(){ const t=encodeURIComponent(shareText()+'\n'+location.href); window.open(`https://line.me/R/msg/text/?${t}`,'_blank'); }
+// 結果連動で文面を出し分け（自慢系/ツッコミ系/エモ系）。enterResultで1回確定し_share.textに保存
+function buildShareText(s){
+  const b=s.breed?`(${s.breed})`:'';
+  const rareTag = s.rarity==='legend'?' #激レア称号' : s.rarity==='rare'?' #レア称号':'';
+  const extra = s.delta>1 ? '#若見え' : s.overall>=85 ? '#すこやか自慢' : (s.species==='cat'?'#猫のいる暮らし':'#犬のいる暮らし');
+  const tmpls=[
+    `うちの子${b}、健康年齢${s.healthAge}歳でした✨ 実年齢より${s.deltaShort}、称号は「${s.title}」🏅`,
+    `AIにうちの子${b}を診てもらったら健康年齢${s.healthAge}歳😳 称号「${s.title}」もらった（${s.deltaShort}だって）`,
+    `今日もこの子${b}が元気でなにより🐾 健康年齢${s.healthAge}歳、「${s.title}」をいただきました。ずっと健康でいてね`,
+  ];
+  const t=tmpls[Math.floor(Math.random()*tmpls.length)];
+  return `${t}\n#MOFURI #うちの子健康診断 ${extra}${rareTag}`;
+}
+function shareText(){ const s=window._share||{}; return s.text || `うちの子の健康年齢を診断したよ🐾 #MOFURI #うちの子健康診断`; }
+function shareX(){ const u=encodeURIComponent(SHARE_URL); const t=encodeURIComponent(shareText()); window.open(`https://twitter.com/intent/tweet?text=${t}&url=${u}`,'_blank'); }
+function shareLine(){ const t=encodeURIComponent(shareText()+'\n'+SHARE_URL); window.open(`https://line.me/R/msg/text/?${t}`,'_blank'); }
+function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.crossOrigin='anonymous'; im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
+
+// 正方形シェアカードを描画。usePhoto=falseで称号アイコンにフォールバック
+function buildCard(img, s){
+  const W=1080,H=1080; const cv=document.createElement('canvas'); cv.width=W;cv.height=H; const x=cv.getContext('2d');
+  const g=x.createRadialGradient(W*0.7,H*0.16,80,W*0.5,H*0.5,W*0.85); g.addColorStop(0,'#1c1408'); g.addColorStop(1,'#050505'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  x.textAlign='center';
+  x.fillStyle='#F4A340'; x.font='800 40px Inter,sans-serif'; x.fillText('◆ MOFURI.',W/2,96);
+  // 円形にトリミングしたペット写真（無ければ称号アイコン）
+  const cx=W/2, cy=330, R=150;
+  x.save(); x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.closePath(); x.clip();
+  if(img){ const ratio=Math.max(2*R/img.width, 2*R/img.height); const dw=img.width*ratio, dh=img.height*ratio; x.drawImage(img, cx-dw/2, cy-dh/2, dw, dh); }
+  else { x.fillStyle='#16223f'; x.fillRect(cx-R,cy-R,2*R,2*R); x.fillStyle='#F4A340'; x.font='130px serif'; x.textBaseline='middle'; x.fillText(s.em||'🐾',cx,cy+6); x.textBaseline='alphabetic'; }
+  x.restore();
+  x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.lineWidth=6; x.strokeStyle='#F4A340'; x.stroke();
+  if(s.rarity && s.rarity!=='normal'){ x.fillStyle=s.rarity==='legend'?'#FFE9B0':'#F4A340'; x.font='700 22px "Space Grotesk",sans-serif'; x.fillText(s.rarity==='legend'?'★ LEGEND ★':'✦ RARE ✦', cx, cy+R+34); }
+  // テキスト群
+  x.fillStyle='#A8A29A'; x.font='500 30px "Noto Sans JP",sans-serif'; x.fillText('うちの子の健康年齢',W/2,565);
+  x.fillStyle='#F4A340'; x.font='800 168px "Space Grotesk",Inter,sans-serif'; x.fillText(s.healthAge+'歳',W/2,725);
+  x.fillStyle='#F6F2EA'; x.font='600 36px "Noto Sans JP",sans-serif'; x.fillText(`実年齢 ${s.realAge}歳  →  健康年齢 ${s.healthAge}歳`,W/2,800);
+  x.fillStyle=s.delta>0.05?'#5FD0A0':s.delta<-0.05?'#E8635F':'#FFC57D'; x.font='800 50px "Noto Sans JP",sans-serif'; x.fillText(s.deltaShort||'',W/2,885);
+  x.fillStyle='#FFC57D'; x.font='700 44px "Noto Sans JP",sans-serif'; x.fillText(`${s.em} ${s.title}`,W/2,965);
+  x.fillStyle='#6E6A63'; x.font='500 26px Inter,sans-serif'; x.fillText('AI HEALTH SCORE ・ '+SHARE_LABEL,W/2,1035);
+  return cv;
+}
 async function saveImage(){
-  if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }   // フォント確定後に描画
-  const s=window._share||{}; const W=1080,H=1080; const cv=document.createElement('canvas'); cv.width=W;cv.height=H; const x=cv.getContext('2d');
-  const g=x.createRadialGradient(W*0.7,H*0.2,80,W*0.5,H*0.5,W*0.8); g.addColorStop(0,'#1c1408'); g.addColorStop(1,'#050505'); x.fillStyle=g; x.fillRect(0,0,W,H);
-  x.fillStyle='#F4A340'; x.font='800 44px Inter,sans-serif'; x.textAlign='center'; x.fillText('◆ MOFURI.',W/2,150);
-  x.fillStyle='#A8A29A'; x.font='500 34px "Noto Sans JP",sans-serif'; x.fillText('うちの子の健康年齢',W/2,300);
-  x.fillStyle='#F4A340'; x.font='800 220px "Space Grotesk",Inter,sans-serif'; x.fillText(s.healthAge+'歳',W/2,540);
-  x.fillStyle='#F6F2EA'; x.font='600 40px "Noto Sans JP",sans-serif'; x.fillText(`実年齢 ${s.realAge}歳  →  健康年齢 ${s.healthAge}歳`,W/2,650);
-  x.fillStyle=s.delta>0.05?'#5FD0A0':s.delta<-0.05?'#E8635F':'#FFC57D'; x.font='800 56px "Noto Sans JP",sans-serif'; x.fillText(s.deltaShort||'',W/2,760);
-  x.fillStyle='#FFC57D'; x.font='700 46px "Noto Sans JP",sans-serif'; x.fillText(`${s.em} ${s.title}`,W/2,880);
-  x.fillStyle='#6E6A63'; x.font='500 26px Inter,sans-serif'; x.fillText('AI HEALTH SCORE ・ MOFURI.',W/2,980);
+  if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+  const s=window._share||{};
+  const img = wiz.photo ? await loadImg(wiz.photo) : null;
+  let cv = buildCard(img, s);
+  // 写真がCORSで汚染した場合は写真なしで再生成
+  try { cv.toDataURL('image/png'); } catch(e){ cv = buildCard(null, s); }
   const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  if(isIOS){ // iOS Safari は download属性が効かない → 新規タブで開き長押し保存を案内
-    cv.toBlob(b=>{ if(!b) return; window.open(URL.createObjectURL(b),'_blank'); setTimeout(()=>alert('画像を長押しして「写真に追加」で保存できます 🐾'),300); },'image/png');
-  } else {
-    const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click();
-  }
+  if(isIOS){ cv.toBlob(b=>{ if(!b) return; window.open(URL.createObjectURL(b),'_blank'); setTimeout(()=>alert('画像を長押しして「写真に追加」で保存できます 🐾'),300); },'image/png'); }
+  else { const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click(); }
 }
 
 function restart(){
