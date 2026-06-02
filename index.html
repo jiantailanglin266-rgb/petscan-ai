@@ -315,6 +315,14 @@ img{display:block; max-width:100%}
 .pc-bar i{flex:1; height:9px; background:#241f17; border:1px solid #0c0a07; position:relative; overflow:hidden}
 .pc-bar i::after{content:""; position:absolute; inset:0; width:var(--w,0); background:repeating-linear-gradient(90deg,#F4A340 0 5px,#c97e2a 5px 6px)}
 .pc-bar.energy i::after{background:repeating-linear-gradient(90deg,#7FE0A0 0 5px,#3f9d6a 5px 6px)}
+/* レア/レジェンド称号の演出（保存PNGにも残るバッジ＋画面ではグロー）*/
+.pixel-card.rare{box-shadow:0 0 0 2px rgba(244,163,64,.55), 0 0 26px rgba(244,163,64,.5)}
+.pixel-card.legend{animation:legendGlow 1.3s ease-in-out infinite}
+@keyframes legendGlow{0%,100%{box-shadow:0 0 0 2px #FFE9B0, 0 0 22px rgba(244,163,64,.55)}50%{box-shadow:0 0 0 2px #FFF6E0, 0 0 42px rgba(244,163,64,.95)}}
+.pc-rare-badge{position:absolute; top:2.4%; right:3.5%; z-index:4; padding:3px 8px;
+  font-family:"Press Start 2P",monospace; font-size:7px; letter-spacing:.04em; white-space:nowrap; border:2px solid; image-rendering:pixelated; transform:rotate(6deg)}
+.pc-rare-badge.rare{color:#FFF6E0; background:#3a2a10; border-color:#F4A340; box-shadow:0 0 10px rgba(244,163,64,.6)}
+.pc-rare-badge.legend{color:#0A0A0A; background:linear-gradient(#FFE9B0,#F4A340); border-color:#FFF6E0; box-shadow:0 0 14px rgba(244,163,64,.85)}
 /* 友達紹介セクションのマスコット */
 .ref-mascot{width:46px; height:46px; image-rendering:pixelated; vertical-align:middle; margin-right:8px}
 @media(max-width:768px){ .pc-age-sub{font-size:9.5px} .pc-status .row .lab{width:28px} }
@@ -396,6 +404,7 @@ img{display:block; max-width:100%}
     <!-- ピクセル リザルトカード（フレーム画像＋動的オーバーレイ）-->
     <div class="pixel-card-wrap">
       <div class="pixel-card" id="pixelCard">
+        <div class="pc-rare-badge" id="pcRare" hidden></div>
         <div class="pc-photo" id="pcPhoto"></div>
         <div class="pc-age">
           <div class="pc-age-lab">健康年齢</div>
@@ -787,6 +796,14 @@ function enterResult(){
 /* ── ピクセル リザルトカード描画（result / _share を読むだけ・ロジックは不変）── */
 function renderResultCard(){
   const r=result||{}, s=window._share||{};
+  // レア/レジェンド演出（金枠グロー＋バッジ）
+  const card=$('#pixelCard'); if(card) card.className = 'pixel-card' + (s.rarity && s.rarity!=='normal' ? ' '+s.rarity : '');
+  const rb=$('#pcRare');
+  if(rb){
+    if(s.rarity==='legend'){ rb.hidden=false; rb.className='pc-rare-badge legend'; rb.textContent='★ LEGEND ★'; }
+    else if(s.rarity==='rare'){ rb.hidden=false; rb.className='pc-rare-badge rare'; rb.textContent='✦ RARE ✦'; }
+    else { rb.hidden=true; }
+  }
   const pp=$('#pcPhoto'); if(pp) pp.innerHTML = wiz.photo ? `<img src="${wiz.photo}" alt="" crossorigin="anonymous">` : `<div class="fb">${s.em||'🐾'}</div>`;
   if($('#pcHealth')) $('#pcHealth').textContent = s.healthAge ?? '';
   if($('#pcReal'))   $('#pcReal').textContent   = s.realAge ?? '';
