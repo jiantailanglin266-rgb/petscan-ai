@@ -10,16 +10,16 @@
 <meta property="og:site_name" content="MOFURI." />
 <meta property="og:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta property="og:description" content="犬・猫対応。30秒で無料診断。AIが体・目元・口元・毛並み・皮膚の5観点でスコア化。" />
-<meta property="og:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/assets/mofuri-hero.png" />
-<meta property="og:image:width" content="1682" />
-<meta property="og:image:height" content="935" />
+<meta property="og:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/images/og-image.png" />
+<meta property="og:image:width" content="1672" />
+<meta property="og:image:height" content="941" />
 <meta property="og:image:alt" content="MOFURI. — 写真1枚で、うちの子の健康年齢をAI診断" />
 <meta property="og:url" content="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
 <meta property="og:locale" content="ja_JP" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="写真1枚で、うちの子の健康年齢をAI診断 | MOFURI." />
 <meta name="twitter:description" content="犬・猫対応。30秒で無料診断。" />
-<meta name="twitter:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/assets/mofuri-hero.png" />
+<meta name="twitter:image" content="https://jiantailanglin266-rgb.github.io/petscan-ai/images/og-image.png" />
 <link rel="canonical" href="https://jiantailanglin266-rgb.github.io/petscan-ai/" />
 <!-- LCP: ヒーロー画像を media 付きで preload -->
 <link rel="preload" as="image" href="assets/mofuri-hero.webp" media="(min-width:769px)" />
@@ -28,6 +28,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<!-- ドット風フォント（リザルトカード用）-->
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<!-- カードPNG保存用 -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#050505; --bg2:#0B0B0B; --bg3:#111111; --card:#141414; --card2:#1C1A17;
@@ -268,6 +272,52 @@ img{display:block; max-width:100%}
   .stats{grid-template-columns:1fr 1fr}
   .agehero .blk.main .num{font-size:52px}
 }
+
+/* ════════ ピクセル リザルトカード（ドット世界観）════════ */
+/* 旧プレミアム表示は隠し、ドットカードを主役に */
+#result .r-top, #result .gauge-wrap, #result .sec.legacy, #result #shareCard{display:none}
+.pixel-card-wrap{padding:14px 14px 2px}
+.pixel-card{position:relative; width:100%; max-width:392px; margin:0 auto; aspect-ratio:1024/1536;
+  background:url(images/result-frame.png) center/100% 100% no-repeat; image-rendering:pixelated; color:#FCEFD6; user-select:none}
+.pixel-card *{font-family:"DotGothic16","Noto Sans JP",sans-serif}
+/* CRT走査線 */
+.pixel-card::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px); mix-blend-mode:multiply; opacity:.55}
+/* 写真円窓 */
+.pc-photo{position:absolute; left:50%; top:33.5%; transform:translate(-50%,-50%); width:26%; aspect-ratio:1; border-radius:50%; overflow:hidden; background:#0a0a0a}
+.pc-photo img{width:100%; height:100%; object-fit:cover}
+.pc-photo .fb{width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:42px}
+/* 健康年齢パネル */
+.pc-age{position:absolute; left:8%; top:47.5%; width:84%; text-align:center}
+.pc-age-lab{font-size:11px; color:#7FE0A0; letter-spacing:.12em}
+.pc-age-num{font-family:"Press Start 2P",monospace; color:#F4A340; font-size:clamp(20px,7.5vw,30px); line-height:1.1; text-shadow:2px 2px 0 #7a3d00; margin-top:5px}
+.pc-age-num .u{font-size:.5em; margin-left:3px}
+.pc-age-sub{font-size:10.5px; color:#FCEFD6; margin-top:6px}
+.pc-age-sub #pcDelta{color:#7FE0A0; font-weight:700}
+.pc-age-sub #pcDelta.warn{color:#FF8A5B}
+/* 総合バランス レーダー（左パネル）*/
+.pc-radar{position:absolute; left:9.5%; top:64.5%; width:30%; aspect-ratio:1}
+.pc-radar canvas{width:100%; height:100%; image-rendering:pixelated}
+/* ステータス（右パネル）*/
+.pc-status{position:absolute; left:53%; top:63.5%; width:40%}
+.pc-status .row{display:flex; align-items:center; gap:3px; margin-bottom:3px}
+.pc-status .row .ic{width:11px; text-align:center; font-size:8px}
+.pc-status .row .lab{width:34px; font-size:8px; white-space:nowrap; color:#FCEFD6}
+.pc-status .row .seg{flex:1; display:flex; gap:1px}
+.pc-status .row .seg i{flex:1; height:5px; background:#241f17; border:1px solid #0c0a07}
+.pc-status .row .seg i.on{background:#F4A340}
+.pc-status .row .sc{width:16px; text-align:right; font-family:"Press Start 2P",monospace; font-size:6px; color:#7FE0A0}
+/* バイタル（下部 心電図＋HP＋ENERGY）*/
+.pc-vital{position:absolute; left:8%; top:83%; width:84%}
+.pc-vital canvas{width:100%; height:20px; image-rendering:pixelated; display:block}
+.pc-bar{display:flex; align-items:center; gap:6px; margin-top:5px}
+.pc-bar .pcb-l{font-size:8px; width:48px; color:#7FE0A0; letter-spacing:.04em}
+.pc-bar i{flex:1; height:9px; background:#241f17; border:1px solid #0c0a07; position:relative; overflow:hidden}
+.pc-bar i::after{content:""; position:absolute; inset:0; width:var(--w,0); background:repeating-linear-gradient(90deg,#F4A340 0 5px,#c97e2a 5px 6px)}
+.pc-bar.energy i::after{background:repeating-linear-gradient(90deg,#7FE0A0 0 5px,#3f9d6a 5px 6px)}
+/* 友達紹介セクションのマスコット */
+.ref-mascot{width:46px; height:46px; image-rendering:pixelated; vertical-align:middle; margin-right:8px}
+@media(max-width:768px){ .pc-age-sub{font-size:9.5px} .pc-status .row .lab{width:28px} }
 </style>
 </head>
 <body>
@@ -343,6 +393,25 @@ img{display:block; max-width:100%}
 
   <!-- ════════ RESULT ════════ -->
   <div id="result" class="view">
+    <!-- ピクセル リザルトカード（フレーム画像＋動的オーバーレイ）-->
+    <div class="pixel-card-wrap">
+      <div class="pixel-card" id="pixelCard">
+        <div class="pc-photo" id="pcPhoto"></div>
+        <div class="pc-age">
+          <div class="pc-age-lab">健康年齢</div>
+          <div class="pc-age-num"><span id="pcHealth">5.6</span><span class="u">歳</span></div>
+          <div class="pc-age-sub">実年齢 <b id="pcReal">8</b>歳 → <span id="pcDelta">−2.4歳 若見え</span></div>
+        </div>
+        <div class="pc-radar"><canvas id="pcRadar" width="210" height="210"></canvas></div>
+        <div class="pc-status" id="pcStatus"></div>
+        <div class="pc-vital">
+          <canvas id="pcEcg" width="300" height="48"></canvas>
+          <div class="pc-bar"><span class="pcb-l">HP</span><i id="pcHp"></i></div>
+          <div class="pc-bar energy"><span class="pcb-l">ENERGY</span><i id="pcEn"></i></div>
+        </div>
+      </div>
+    </div>
+
     <div class="r-top">
       <div class="wrap">
         <div class="r-title">AI Health Report</div>
@@ -378,12 +447,12 @@ img{display:block; max-width:100%}
         </div>
       </div>
 
-      <div class="sec">
+      <div class="sec legacy">
         <div class="sec-t">5観点コンディション</div>
         <div id="metrics"></div>
       </div>
 
-      <div class="sec">
+      <div class="sec legacy">
         <div class="sec-t">AIコメント</div>
         <div class="story"><div class="qh">💬 AIからのコメント</div><p id="rStory"></p></div>
       </div>
@@ -412,7 +481,7 @@ img{display:block; max-width:100%}
       </div>
 
       <div class="referral">
-        <h3>友達の子の健康年齢も、気になりませんか？</h3>
+        <h3><img src="images/mascot.png" alt="" class="ref-mascot">友達の子の健康年齢も、気になりませんか？</h3>
         <p>結果をシェアして、友達のペットも診断してあげよう。</p>
         <button class="cta" onclick="shareX()">シェアして広める 🐾</button>
         <div class="ref-links">
@@ -712,6 +781,52 @@ function enterResult(){
   countUp($('#gScore'),r.overall,1000);
   particleBurst(gt.c, rarity);
   buzz([30,60,30]);
+  renderResultCard();   // ドット リザルトカードへ反映（既存スコア変数に連動）
+}
+
+/* ── ピクセル リザルトカード描画（result / _share を読むだけ・ロジックは不変）── */
+function renderResultCard(){
+  const r=result||{}, s=window._share||{};
+  const pp=$('#pcPhoto'); if(pp) pp.innerHTML = wiz.photo ? `<img src="${wiz.photo}" alt="" crossorigin="anonymous">` : `<div class="fb">${s.em||'🐾'}</div>`;
+  if($('#pcHealth')) $('#pcHealth').textContent = s.healthAge ?? '';
+  if($('#pcReal'))   $('#pcReal').textContent   = s.realAge ?? '';
+  const dEl=$('#pcDelta'); if(dEl){ dEl.textContent = s.deltaShort||''; dEl.classList.toggle('warn', (s.delta||0) < -0.05); }
+  // ステータス6行（既存メトリクスをマッピング: HP=総合 / 運動=体型 / 栄養=毛並み / 休養=皮膚 / 免疫=口元 / メンタル=目元）
+  const V=[['HP','❤',r.overall],['運動','🏃',r.body],['栄養','🍖',r.coat],['休養','🌙',r.skin],['免疫','🛡',r.mouth],['メンタル','✨',r.eyes]];
+  const st=$('#pcStatus'); if(st) st.innerHTML = V.map(([lab,ic,val])=>{
+    const v=Math.round(val||0), on=Math.max(0,Math.min(10,Math.round(v/10)));
+    const segs=Array.from({length:10},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('');
+    return `<div class="row"><span class="ic">${ic}</span><span class="lab">${lab}</span><span class="seg">${segs}</span><span class="sc">${v}</span></div>`;
+  }).join('');
+  // レーダー（運動/栄養/休養/メンタル/免疫）
+  drawRadar([r.body,r.coat,r.skin,r.eyes,r.mouth]);
+  drawEcg();
+  if($('#pcHp')) $('#pcHp').style.setProperty('--w', Math.max(0,Math.min(100,r.overall||0))+'%');
+  if($('#pcEn')) $('#pcEn').style.setProperty('--w', Math.max(0,Math.min(100,(r.body||0)+8))+'%');
+}
+function drawRadar(vals){
+  const cv=$('#pcRadar'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height;
+  x.clearRect(0,0,W,H); const cx=W/2, cy=H/2+6, R=W*0.36, N=5;
+  const pt=(ang,rad)=>[cx+Math.cos(ang)*rad, cy+Math.sin(ang)*rad];
+  const ang=i=>-Math.PI/2 + i*2*Math.PI/N;
+  // グリッド（緑のピクセル線）
+  x.strokeStyle='rgba(127,224,160,.55)'; x.lineWidth=1.5;
+  for(let ring=1;ring<=3;ring++){ x.beginPath(); for(let i=0;i<=N;i++){ const [px,py]=pt(ang(i),R*ring/3); i?x.lineTo(px,py):x.moveTo(px,py);} x.stroke(); }
+  for(let i=0;i<N;i++){ const [px,py]=pt(ang(i),R); x.beginPath(); x.moveTo(cx,cy); x.lineTo(px,py); x.stroke(); }
+  // データ多角形（塗り=半透明オレンジ / 線=オレンジ）
+  x.beginPath();
+  vals.forEach((v,i)=>{ const rad=R*Math.max(0.12,Math.min(1,(v||0)/100)); const [px,py]=pt(ang(i),rad); i?x.lineTo(px,py):x.moveTo(px,py); });
+  x.closePath(); x.fillStyle='rgba(244,163,64,.45)'; x.fill(); x.strokeStyle='#F4A340'; x.lineWidth=2; x.stroke();
+  // 頂点ラベル
+  x.fillStyle='#FCEFD6'; x.font='9px "DotGothic16",monospace'; x.textAlign='center';
+  ['運動','栄養','休養','メンタル','免疫'].forEach((lab,i)=>{ const [px,py]=pt(ang(i),R+12); x.fillText(lab,px,py+3); });
+}
+function drawEcg(){
+  const cv=$('#pcEcg'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height; const m=H/2;
+  x.clearRect(0,0,W,H); x.strokeStyle='#7FE0A0'; x.lineWidth=2; x.beginPath(); x.moveTo(0,m);
+  let px=0; const seg=()=>{ const p=[[14,0],[6,0],[3,-3],[3,6],[4,-H*0.7],[4,H*0.7],[3,-3],[6,0],[14,0]]; p.forEach(([dx,dy])=>{ px+=dx; x.lineTo(px, m+dy*0.5);} ); };
+  while(px<W){ seg(); }
+  x.stroke();
 }
 function countUp(el,to,dur){const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/dur);el.textContent=Math.round(to*k);if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);}
 function particleBurst(col, rarity){ if(reduce)return; const host=$('#burst'); host.innerHTML='';
@@ -769,16 +884,28 @@ function buildCard(img, s){
   x.fillStyle='#6E6A63'; x.font='500 26px Inter,sans-serif'; x.fillText('AI HEALTH SCORE ・ '+SHARE_LABEL,W/2,1035);
   return cv;
 }
-async function saveImage(){
-  if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
-  const s=window._share||{};
-  const img = wiz.photo ? await loadImg(wiz.photo) : null;
-  let cv = buildCard(img, s);
-  // 写真がCORSで汚染した場合は写真なしで再生成
-  try { cv.toDataURL('image/png'); } catch(e){ cv = buildCard(null, s); }
+// 共通: canvas を保存（iOSは長押し保存に案内）
+function exportCanvas(cv){
   const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){ cv.toBlob(b=>{ if(!b) return; window.open(URL.createObjectURL(b),'_blank'); setTimeout(()=>alert('画像を長押しして「写真に追加」で保存できます 🐾'),300); },'image/png'); }
   else { const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click(); }
+}
+// メイン: ドットカードを html2canvas でそのままPNG化
+async function saveImage(){
+  if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+  const card=$('#pixelCard');
+  if(typeof html2canvas==='function' && card){
+    try{
+      const cv = await html2canvas(card, { backgroundColor:'#000000', scale:2, useCORS:true, allowTaint:false, logging:false });
+      exportCanvas(cv); return;
+    }catch(e){ /* 失敗時は下のフォールバックへ */ }
+  }
+  // フォールバック: 既存の手描きCanvasカード
+  const s=window._share||{};
+  const img = wiz.photo ? await loadImg(wiz.photo) : null;
+  let cv = buildCard(img, s);
+  try { cv.toDataURL('image/png'); } catch(e){ cv = buildCard(null, s); }
+  exportCanvas(cv);
 }
 
 function restart(){
