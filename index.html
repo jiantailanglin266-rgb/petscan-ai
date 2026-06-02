@@ -247,12 +247,12 @@ img{display:block; max-width:100%}
 .sharecard .sc-title{margin-top:14px;font-size:13px;color:var(--accent2);font-weight:700}
 .sharecard .sc-foot{margin-top:16px;font-size:10px;color:var(--text-low);letter-spacing:.1em}
 .share-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
-.sbtn{padding:14px 8px;border-radius:var(--r-md);border:1px solid var(--line2);background:var(--card);color:var(--text-hi);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sbtn{padding:14px 6px;border-radius:var(--r-md);border:1px solid var(--line2);background:var(--card);color:var(--text-hi);font-family:inherit;font-weight:700;font-size:12.5px;line-height:1.25;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
 .sbtn:active{transform:scale(.97)}
-.sbtn .si{font-size:18px}
+.sbtn .si{font-size:18px;display:flex;align-items:center;line-height:0}
 .sbtn.x{background:#000;border-color:#333}
 .sbtn.line{background:#06C755;color:#fff;border:none}
-.sbtn.save{background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#1a0f02;border:none}
+.sbtn.ig{background:linear-gradient(45deg,#F58529 0%,#DD2A7B 45%,#8134AF 72%,#515BD4 100%);color:#fff;border:none;font-size:11.5px}
 
 .care{margin-top:26px;border:1px solid var(--line);border-radius:var(--r-md);padding:18px;background:linear-gradient(135deg,rgba(244,163,64,.1),rgba(244,163,64,.02));display:flex;justify-content:space-between;align-items:center}
 .care .t{font-size:12px;color:var(--text-mid)}
@@ -496,7 +496,7 @@ img{display:block; max-width:100%}
         <div class="share-btns">
           <button class="sbtn x" onclick="shareX()"><span class="si">𝕏</span>Xでシェア</button>
           <button class="sbtn line" onclick="shareLine()"><span class="si">💬</span>LINEで送る</button>
-          <button class="sbtn save" onclick="saveImage()"><span class="si">⬇</span>画像を保存</button>
+          <button class="sbtn ig" onclick="shareInstagram()"><span class="si"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5.2"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.1" fill="#fff" stroke="none"/></svg></span><span>Instagram<br>でシェア</span></button>
         </div>
       </div>
 
@@ -985,22 +985,36 @@ function exportCanvas(cv){
   if(isIOS){ cv.toBlob(b=>{ if(!b) return; window.open(URL.createObjectURL(b),'_blank'); setTimeout(()=>alert('画像を長押しして「写真に追加」で保存できます 🐾'),300); },'image/png'); }
   else { const a=document.createElement('a'); a.download='mofuri-health.png'; a.href=cv.toDataURL('image/png'); a.click(); }
 }
-// メイン: ドットカードを html2canvas でそのままPNG化
-async function saveImage(){
+// ドットカードを html2canvas でPNG化（失敗時は手描きCanvasにフォールバック）
+async function renderCardCanvas(){
   if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
   const card=$('#pixelCard');
   if(typeof html2canvas==='function' && card){
     try{
       const cv = await html2canvas(card, { backgroundColor:'#000000', scale:2, useCORS:true, allowTaint:false, logging:false });
-      exportCanvas(cv); return;
-    }catch(e){ /* 失敗時は下のフォールバックへ */ }
+      cv.toDataURL('image/png');  // 汚染チェック
+      return cv;
+    }catch(e){ /* フォールバックへ */ }
   }
-  // フォールバック: 既存の手描きCanvasカード
   const s=window._share||{};
   const img = wiz.photo ? await loadImg(wiz.photo) : null;
   let cv = buildCard(img, s);
   try { cv.toDataURL('image/png'); } catch(e){ cv = buildCard(null, s); }
+  return cv;
+}
+async function saveImage(){ exportCanvas(await renderCardCanvas()); }
+// Instagramでシェア: スマホはWeb Share(画像付き)でネイティブ共有シート→Instagram選択。非対応は保存＋投稿案内
+async function shareInstagram(){
+  const cv = await renderCardCanvas();
+  let blob=null; try{ blob = await new Promise(r=>cv.toBlob(r,'image/png')); }catch(e){}
+  const file = blob ? new File([blob],'mofuri-health.png',{type:'image/png'}) : null;
+  if(file && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({ files:[file], text: shareText() }); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }   // キャンセルは無視
+  }
+  // フォールバック: 画像保存＋Instagram投稿の案内
   exportCanvas(cv);
+  setTimeout(()=>alert('画像を保存しました📷\nInstagramアプリを開いて、ストーリーや投稿にアップしてください！'),250);
 }
 
 function restart(){
