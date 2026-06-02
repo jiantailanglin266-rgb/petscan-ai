@@ -326,6 +326,12 @@ img{display:block; max-width:100%}
   font-family:"Press Start 2P",monospace; font-size:7px; letter-spacing:.04em; white-space:nowrap; border:2px solid; image-rendering:pixelated; transform:rotate(6deg)}
 .pc-rare-badge.rare{color:#FFF6E0; background:#3a2a10; border-color:#F4A340; box-shadow:0 0 10px rgba(244,163,64,.6)}
 .pc-rare-badge.legend{color:#0A0A0A; background:linear-gradient(#FFE9B0,#F4A340); border-color:#FFF6E0; box-shadow:0 0 14px rgba(244,163,64,.85)}
+/* AI分析健康チェック */
+.ai-check{margin:18px 0 2px; background:linear-gradient(180deg,#141414,#0d0d0d); border:1px solid var(--line); border-radius:var(--r-md); padding:18px 20px; position:relative; overflow:hidden}
+.ai-check::after{content:""; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 2px, transparent 2px 4px); opacity:.5}
+.ai-check-t{font-family:"DotGothic16",sans-serif; color:var(--accent2); font-weight:700; font-size:14px; letter-spacing:.06em; margin-bottom:11px; display:flex; align-items:center; gap:8px}
+.ai-check-t .ic{font-size:16px}
+.ai-check p{font-size:13.5px; line-height:1.95; color:var(--text-hi); position:relative; z-index:1}
 /* 友達紹介セクションのマスコット */
 .ref-mascot{width:46px; height:46px; image-rendering:pixelated; vertical-align:middle; margin-right:8px}
 @media(max-width:768px){ .pc-age-sub{font-size:9.5px} .pc-status .row .lab{width:28px} }
@@ -420,6 +426,14 @@ img{display:block; max-width:100%}
         <div class="pc-vital">
           <canvas id="pcEcg" width="300" height="40"></canvas>
         </div>
+      </div>
+    </div>
+
+    <!-- AI分析健康チェック（約100字・16パターンから表示）-->
+    <div class="wrap" style="max-width:680px">
+      <div class="ai-check">
+        <div class="ai-check-t"><span class="ic">📊</span>AI分析健康チェック</div>
+        <p id="aiCheck"></p>
       </div>
     </div>
 
@@ -719,6 +733,39 @@ function storyOf(o){
   return '気になる観点がいくつか見られます。深刻なものではありませんが、毛並みや目元のケアを少し意識してあげると、コンディションの底上げが期待できます。気になる場合は獣医師にご相談ください。';
 }
 
+/* ── AI分析健康チェック（約100字×16パターン・スコア帯で選択）── */
+const AI_CHECKS={
+  high:[
+    nm=>`${nm}は同年代の中でもとても良いコンディションです。毛並みや体型のバランスも整っていて、毎日のケアがしっかり実を結んでいます。今の生活リズムを大切に、これからも健やかに過ごしていきましょう。`,
+    nm=>`AI分析では${nm}の健康状態は良好でした。栄養・運動・休養のバランスが取れており、若々しさが保たれています。引き続き無理のない範囲で、今のケアを続けてあげてください。`,
+    nm=>`${nm}はとても元気なコンディションのようです。全体的に数値が安定しており、大きな心配は見当たりません。季節の変わり目は体調を崩しやすいので、様子の変化だけ見てあげましょう。`,
+    nm=>`素晴らしいバランスです。${nm}は体・毛並み・活力のどれも良い状態で、日々のケアの成果が表れています。水分補給と適度な運動を続けて、この調子をキープしていきましょう。`,
+    nm=>`${nm}の健康年齢は実年齢より若めの傾向です。生活習慣が整っている証拠といえます。これからも食事と運動のリズムを保ちつつ、ゆったり過ごせる時間も大切にしてあげてください。`,
+  ],
+  midhi:[
+    nm=>`${nm}は全体的にバランスの取れたコンディションです。いくつかの観点で「もう一歩」が見られますが、深刻なものではありません。日々のケアで十分に伸ばしていける状態です。`,
+    nm=>`AI分析では${nm}はおおむね良好でした。毛並みや活力は安定していますが、季節や生活リズムで揺らぎやすい部分も。ブラッシングや軽い運動を意識すると、さらに整っていきます。`,
+    nm=>`${nm}は健やかに過ごせているようです。気になる点は大きくありませんが、食事のバランスや水分量を見直すと底上げが期待できます。気になる変化があれば、早めに様子を見てあげましょう。`,
+    nm=>`安定したコンディションです。${nm}は大きな崩れがなく、日常のケアがうまくいっています。運動と休養のメリハリをつけると、よりコンディションが整いやすくなります。`,
+  ],
+  mid:[
+    nm=>`${nm}は標準的なコンディションです。いくつかの観点で気になるポイントが見られますが、日々のケアで整えていける範囲です。食事・運動・休養のバランスを少し意識してみましょう。`,
+    nm=>`AI分析では${nm}に「ひと工夫」できる余地が見られました。深刻ではありませんが、毛並みや目元のケアを少し増やすと印象が変わります。気になる場合は獣医師に相談してみてください。`,
+    nm=>`${nm}はもう少し整えられそうなコンディションです。体型や活動量のバランスを見直すと、数値の底上げが期待できます。焦らず、できることから少しずつ続けてあげましょう。`,
+    nm=>`${nm}は今がケアの見直しどきかもしれません。大きな心配はありませんが、食事内容や運動量を整えることで、より健やかな状態に近づけます。日々の小さな変化を見てあげてください。`,
+  ],
+  low:[
+    nm=>`${nm}は少し気になる観点が見られました。深刻なものではありませんが、毛並みや目元、体型のケアを意識してあげると安心です。気になる症状が続く場合は、獣医師にご相談ください。`,
+    nm=>`AI分析では${nm}にいくつか「いたわりポイント」が見つかりました。生活リズムや食事を整えつつ、無理のない範囲でケアを。気になる変化があるときは、早めに獣医師へ相談しましょう。`,
+    nm=>`${nm}はゆっくりケアしてあげたいコンディションです。あせらず、食事・運動・休養を少しずつ整えていきましょう。気になる状態が続くようなら、獣医師に診てもらうと安心です。`,
+  ],
+};
+function aiCheckText(){
+  const o=(result||{}).overall||0, nm=wiz.name||'この子';
+  const pool = o>=85?AI_CHECKS.high : o>=75?AI_CHECKS.midhi : o>=65?AI_CHECKS.mid : AI_CHECKS.low;
+  return pool[Math.floor(Math.random()*pool.length)](nm);
+}
+
 /* ── スキャン演出 ── */
 let result=null, scanRunning=false, _st=[], _sr=[];
 function clearScan(){ _st.forEach(clearTimeout); _sr.forEach(cancelAnimationFrame); _st=[]; _sr=[]; }
@@ -819,6 +866,7 @@ function renderResultCard(){
   }
   const pp=$('#pcPhoto'); if(pp) pp.innerHTML = wiz.photo ? `<img src="${wiz.photo}" alt="" crossorigin="anonymous">` : `<div class="fb">${s.em||'🐾'}</div>`;
   if($('#pcName')) $('#pcName').textContent = (wiz.name||'うちの子');
+  if($('#aiCheck')) $('#aiCheck').textContent = aiCheckText();   // AI分析健康チェック（16パターン）
   if($('#pcHealth')) $('#pcHealth').textContent = s.healthAge ?? '';
   if($('#pcReal'))   $('#pcReal').textContent   = s.realAge ?? '';
   const dEl=$('#pcDelta'); if(dEl){ dEl.textContent = s.deltaShort||''; dEl.classList.toggle('warn', (s.delta||0) < -0.05); }
