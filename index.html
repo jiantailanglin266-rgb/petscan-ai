@@ -284,37 +284,35 @@ img{display:block; max-width:100%}
 .pixel-card::after{content:""; position:absolute; inset:0; pointer-events:none;
   background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px); mix-blend-mode:multiply; opacity:.55}
 /* 写真円窓 */
-.pc-photo{position:absolute; left:50%; top:33.5%; transform:translate(-50%,-50%); width:26%; aspect-ratio:1; border-radius:50%; overflow:hidden; background:#0a0a0a}
+.pc-photo{position:absolute; left:50%; top:31%; transform:translate(-50%,-50%); width:29.5%; aspect-ratio:1; border-radius:50%; overflow:hidden; background:#0a0a0a}
 .pc-photo img{width:100%; height:100%; object-fit:cover}
 .pc-photo .fb{width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:42px}
-/* 健康年齢パネル */
-.pc-age{position:absolute; left:8%; top:47.5%; width:84%; text-align:center}
-.pc-age-lab{font-size:11px; color:#7FE0A0; letter-spacing:.12em}
-.pc-age-num{font-family:"Press Start 2P",monospace; color:#F4A340; font-size:clamp(20px,7.5vw,30px); line-height:1.1; text-shadow:2px 2px 0 #7a3d00; margin-top:5px}
+/* 健康年齢パネル（46〜60%に縦中央寄せで収める）*/
+.pc-age{position:absolute; left:8%; top:46%; width:84%; height:14%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px}
+.pc-age-lab{font-size:10px; color:#7FE0A0; letter-spacing:.12em}
+.pc-age-num{font-family:"Press Start 2P",monospace; color:#F4A340; font-size:clamp(18px,6vw,24px); line-height:1; text-shadow:2px 2px 0 #7a3d00}
 .pc-age-num .u{font-size:.5em; margin-left:3px}
-.pc-age-sub{font-size:10.5px; color:#FCEFD6; margin-top:6px}
+.pc-age-sub{font-size:10px; color:#FCEFD6}
 .pc-age-sub #pcDelta{color:#7FE0A0; font-weight:700}
 .pc-age-sub #pcDelta.warn{color:#FF8A5B}
-/* 総合バランス レーダー（左パネル）*/
-.pc-radar{position:absolute; left:9.5%; top:64.5%; width:30%; aspect-ratio:1}
+/* 総合バランス レーダー（左パネル内容 67〜86%）*/
+.pc-radar{position:absolute; left:9%; top:66.8%; width:30%; aspect-ratio:1}
 .pc-radar canvas{width:100%; height:100%; image-rendering:pixelated}
-/* ステータス（右パネル）*/
-.pc-status{position:absolute; left:53%; top:63.5%; width:40%}
-.pc-status .row{display:flex; align-items:center; gap:3px; margin-bottom:3px}
+/* ステータス（右パネル内容 67〜86%）*/
+.pc-status{position:absolute; left:53%; top:67%; width:39%}
+.pc-status .row{display:flex; align-items:center; gap:4px; margin-bottom:3px}
 .pc-status .row .ic{width:11px; text-align:center; font-size:8px}
 .pc-status .row .lab{width:34px; font-size:8px; white-space:nowrap; color:#FCEFD6}
 .pc-status .row .seg{flex:1; display:flex; gap:1px}
-.pc-status .row .seg i{flex:1; height:5px; background:#241f17; border:1px solid #0c0a07}
+.pc-status .row .seg i{flex:1; height:6px; background:#241f17; border:1px solid #0c0a07}
 .pc-status .row .seg i.on{background:#F4A340}
 .pc-status .row .sc{width:16px; text-align:right; font-family:"Press Start 2P",monospace; font-size:6px; color:#7FE0A0}
-/* バイタル（下部 心電図＋HP＋ENERGY）*/
-.pc-vital{position:absolute; left:8%; top:83%; width:84%}
-.pc-vital canvas{width:100%; height:20px; image-rendering:pixelated; display:block}
-.pc-bar{display:flex; align-items:center; gap:6px; margin-top:5px}
-.pc-bar .pcb-l{font-size:8px; width:48px; color:#7FE0A0; letter-spacing:.04em}
-.pc-bar i{flex:1; height:9px; background:#241f17; border:1px solid #0c0a07; position:relative; overflow:hidden}
-.pc-bar i::after{content:""; position:absolute; inset:0; width:var(--w,0); background:repeating-linear-gradient(90deg,#F4A340 0 5px,#c97e2a 5px 6px)}
-.pc-bar.energy i::after{background:repeating-linear-gradient(90deg,#7FE0A0 0 5px,#3f9d6a 5px 6px)}
+/* バイタル（心電図のみ・下部の帯 87.5〜90.5% / フッターと重ねない）*/
+.pc-vital{position:absolute; left:8%; top:87.4%; width:84%}
+.pc-vital canvas{width:100%; height:17px; image-rendering:pixelated; display:block}
+/* レジェンド紙吹雪（保存PNGにも焼ける実DOM・静止スキャッタ）*/
+.pc-confetti{position:absolute; inset:0; overflow:hidden; pointer-events:none}
+.pc-confetti i{position:absolute; image-rendering:pixelated; box-shadow:0 0 3px rgba(0,0,0,.5)}
 /* レア/レジェンド称号の演出（保存PNGにも残るバッジ＋画面ではグロー）*/
 .pixel-card.rare{box-shadow:0 0 0 2px rgba(244,163,64,.55), 0 0 26px rgba(244,163,64,.5)}
 .pixel-card.legend{animation:legendGlow 1.3s ease-in-out infinite}
@@ -404,6 +402,7 @@ img{display:block; max-width:100%}
     <!-- ピクセル リザルトカード（フレーム画像＋動的オーバーレイ）-->
     <div class="pixel-card-wrap">
       <div class="pixel-card" id="pixelCard">
+        <div class="pc-confetti" id="pcConfetti"></div>
         <div class="pc-rare-badge" id="pcRare" hidden></div>
         <div class="pc-photo" id="pcPhoto"></div>
         <div class="pc-age">
@@ -414,9 +413,7 @@ img{display:block; max-width:100%}
         <div class="pc-radar"><canvas id="pcRadar" width="210" height="210"></canvas></div>
         <div class="pc-status" id="pcStatus"></div>
         <div class="pc-vital">
-          <canvas id="pcEcg" width="300" height="48"></canvas>
-          <div class="pc-bar"><span class="pcb-l">HP</span><i id="pcHp"></i></div>
-          <div class="pc-bar energy"><span class="pcb-l">ENERGY</span><i id="pcEn"></i></div>
+          <canvas id="pcEcg" width="300" height="40"></canvas>
         </div>
       </div>
     </div>
@@ -686,18 +683,21 @@ function titleOf(o){
   const r=Math.random();
   const legendCh = o>=88?0.06 : o>=80?0.03 : 0.012;
   const rareCh   = o>=80?0.12 : o>=70?0.08 : 0.04;
-  if(r<legendCh)          return pickFrom([['🌈','奇跡のもふもふ'],['🐉','伝説のツヤ毛皇帝'],['🏆','黄金比ボディ']],'legend');
-  if(r<legendCh+rareCh)   return pickFrom([['💎','ダイヤ級コンディション'],['🔥','エナジー絶好調'],['🌟','きらめきオーラ持ち']],'rare');
+  if(r<legendCh)          return pickFrom([['🌈','奇跡のもふもふ'],['🐉','伝説のツヤ毛皇帝'],['🏆','黄金比ボディ'],['🌠','ミラクルスター'],['👑','健康の生き神']],'legend');
+  if(r<legendCh+rareCh)   return pickFrom([['💎','ダイヤ級コンディション'],['🔥','エナジー絶好調'],['🌟','きらめきオーラ持ち'],['⚡','スーパーすこやか'],['🍀','幸運体質']],'rare');
   let pool;
-  if(o>=88)      pool=[['👑','健康王'],['✨','若見えマスター'],['😇','すこやか天使']];
-  else if(o>=80) pool=[['🧸','もふもふ番長'],['🧸','もふもふエリート'],['💛','きらめき美人']];
-  else if(o>=72) pool=[['👑','毛並みプリンセス'],['🧘','バランス賢者'],['🌱','のびしろ星人']];
-  else if(o>=64) pool=[['🌿','マイペース仙人'],['🐾','がんばり屋さん'],['🔰','すくすくケア中']];
-  else           pool=[['🛡️','涙やけガーディアン'],['😴','おやすみ番長'],['🔰','ケア見習い']];
+  if(o>=88)      pool=[['👑','健康王'],['✨','若見えマスター'],['😇','すこやか天使'],['🌞','陽だまりの主'],['💪','アスリート体質']];
+  else if(o>=80) pool=[['🧸','もふもふ番長'],['🧸','もふもふエリート'],['💛','きらめき美人'],['🎀','うるツヤ美人'],['🏅','コンディション上々']];
+  else if(o>=72) pool=[['👑','毛並みプリンセス'],['🧘','バランス賢者'],['🌱','のびしろ星人'],['🌼','ほどよし健康'],['🎋','すこやか見習い王']];
+  else if(o>=64) pool=[['🌿','マイペース仙人'],['🐾','がんばり屋さん'],['🔰','すくすくケア中'],['🍵','のんびり名人'],['🌙','おひるね大臣']];
+  else           pool=[['🛡️','涙やけガーディアン'],['😴','おやすみ番長'],['🔰','ケア見習い'],['🩹','いたわりタイム'],['🔧','メンテナンス中']];
   if(cz.includes('毛並み・抜け毛') && o>=72) pool.push(['🧹','抜け毛ハンター']);
   if(cz.includes('涙やけ'))                  pool.push(['🛡️','涙やけガーディアン']);
   if(sp==='cat')                            pool.push(['🐈','気まぐれニャスター']);
   if(sp==='dog' && o>=80)                    pool.push(['🐕','元気いっぱい大使']);
+  if(wiz.sex==='オス')                       pool.push(['🤴','うちの王子さま']);
+  if(wiz.sex==='メス')                       pool.push(['👸','うちのお姫さま']);
+  if((wiz.ageRep||0)>=8)                     pool.push(['🎖️','ベテラン賢者']);
   return pickFrom(pool,'normal');
 }
 function storyOf(o){
@@ -817,9 +817,19 @@ function renderResultCard(){
   }).join('');
   // レーダー（運動/栄養/休養/メンタル/免疫）
   drawRadar([r.body,r.coat,r.skin,r.eyes,r.mouth]);
-  drawEcg();
-  if($('#pcHp')) $('#pcHp').style.setProperty('--w', Math.max(0,Math.min(100,r.overall||0))+'%');
-  if($('#pcEn')) $('#pcEn').style.setProperty('--w', Math.max(0,Math.min(100,(r.body||0)+8))+'%');
+  drawEcg(r.overall||0);   // 心電図はスコア連動で振幅変化
+  // レジェンド紙吹雪（保存PNGにも残る静止スキャッタ）
+  const conf=$('#pcConfetti');
+  if(conf){
+    if(s.rarity==='legend'){
+      const cols=['#F4A340','#7FE0A0','#FFF6E0','#FFE9B0'];
+      conf.innerHTML=Array.from({length:30},(_,i)=>{
+        const x=2+Math.round(Math.random()*95), y=2+Math.round(Math.random()*95), c=cols[i%cols.length];
+        const sz=4+Math.round(Math.random()*4), rot=Math.round(Math.random()*60-30), rad=Math.random()<.3?'50%':'0';
+        return `<i style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;background:${c};border-radius:${rad};transform:rotate(${rot}deg)"></i>`;
+      }).join('');
+    } else conf.innerHTML='';
+  }
 }
 function drawRadar(vals){
   const cv=$('#pcRadar'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height;
@@ -838,10 +848,15 @@ function drawRadar(vals){
   x.fillStyle='#FCEFD6'; x.font='9px "DotGothic16",monospace'; x.textAlign='center';
   ['運動','栄養','休養','メンタル','免疫'].forEach((lab,i)=>{ const [px,py]=pt(ang(i),R+12); x.fillText(lab,px,py+3); });
 }
-function drawEcg(){
-  const cv=$('#pcEcg'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height; const m=H/2;
-  x.clearRect(0,0,W,H); x.strokeStyle='#7FE0A0'; x.lineWidth=2; x.beginPath(); x.moveTo(0,m);
-  let px=0; const seg=()=>{ const p=[[14,0],[6,0],[3,-3],[3,6],[4,-H*0.7],[4,H*0.7],[3,-3],[6,0],[14,0]]; p.forEach(([dx,dy])=>{ px+=dx; x.lineTo(px, m+dy*0.5);} ); };
+function drawEcg(score){
+  const cv=$('#pcEcg'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height; const m=H*0.56;
+  x.clearRect(0,0,W,H);
+  const amp = 0.32 + 0.78*Math.max(0,Math.min(100,score||0))/100;   // スコアが高いほど力強い拍動
+  x.strokeStyle='#7FE0A0'; x.lineWidth=2; x.beginPath(); x.moveTo(0,m);
+  let px=0;
+  const a=H*0.42*amp;
+  const seg=()=>{ const p=[[16,0],[5,0],[3,-a*0.18],[3,a*0.30],[3,-a],[3,a*0.55],[3,-a*0.12],[6,0],[16,0]];
+    p.forEach(([dx,dy])=>{ px+=dx; x.lineTo(px, m+dy); }); };
   while(px<W){ seg(); }
   x.stroke();
 }
