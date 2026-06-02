@@ -295,12 +295,12 @@ img{display:block; max-width:100%}
 .pc-age-sub{font-size:10px; color:#FCEFD6}
 .pc-age-sub #pcDelta{color:#7FE0A0; font-weight:700}
 .pc-age-sub #pcDelta.warn{color:#FF8A5B}
-/* 総合バランス レーダー（左パネル内容 67〜86%）*/
-.pc-radar{position:absolute; left:9%; top:66.8%; width:30%; aspect-ratio:1}
+/* 総合バランス レーダー（左パネル枠の中央 x27%・y76%）*/
+.pc-radar{position:absolute; left:27%; top:76%; width:27%; aspect-ratio:1; transform:translate(-50%,-50%)}
 .pc-radar canvas{width:100%; height:100%; image-rendering:pixelated}
-/* ステータス（右パネル内容 67〜86%）*/
-.pc-status{position:absolute; left:53%; top:67%; width:39%}
-.pc-status .row{display:flex; align-items:center; gap:4px; margin-bottom:3px}
+/* ステータス（右パネル枠内に上下左右均等配置）*/
+.pc-status{position:absolute; left:54.5%; top:66.5%; width:36%; height:19.5%; display:flex; flex-direction:column; justify-content:space-evenly}
+.pc-status .row{display:flex; align-items:center; gap:4px}
 .pc-status .row .ic{width:11px; text-align:center; font-size:8px}
 .pc-status .row .lab{width:34px; font-size:8px; white-space:nowrap; color:#FCEFD6}
 .pc-status .row .seg{flex:1; display:flex; gap:1px}
@@ -833,7 +833,7 @@ function renderResultCard(){
 }
 function drawRadar(vals){
   const cv=$('#pcRadar'); if(!cv) return; const x=cv.getContext('2d'); const W=cv.width,H=cv.height;
-  x.clearRect(0,0,W,H); const cx=W/2, cy=H/2+6, R=W*0.36, N=5;
+  x.clearRect(0,0,W,H); const cx=W/2, cy=H/2, R=W*0.36, N=5;
   const pt=(ang,rad)=>[cx+Math.cos(ang)*rad, cy+Math.sin(ang)*rad];
   const ang=i=>-Math.PI/2 + i*2*Math.PI/N;
   // グリッド（緑のピクセル線）
