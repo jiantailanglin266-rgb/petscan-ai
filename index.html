@@ -795,7 +795,7 @@ function enterResult(){
   $('#scHealth').textContent=healthAge; $('#scHealth2').textContent=healthAge; $('#scReal').textContent=realAge;
   const scD=$('#scDelta'); scD.textContent=deltaShort; scD.style.color=deltaColor;
   $('#scTitle').textContent=`${em} ${title}`;
-  window._share={healthAge,realAge,delta,deltaShort,title,em,rarity,overall:r.overall,breed:wiz.breed,species:wiz.species,sex:wiz.sex};
+  window._share={healthAge,realAge,delta,deltaShort,title,em,rarity,overall:r.overall,breed:wiz.breed,species:wiz.species,sex:wiz.sex,name:wiz.name};
   window._share.text=buildShareText(window._share);
 
   showView('result'); window.scrollTo(0,0);
@@ -889,15 +889,16 @@ function particleBurst(col, rarity){ if(reduce)return; const host=$('#burst'); h
 /* ── シェア ── */
 // 結果連動で文面を出し分け（自慢系/ツッコミ系/エモ系）。enterResultで1回確定し_share.textに保存
 function buildShareText(s){
+  const nm=s.name||'うちの子';
   const b=s.breed?`(${s.breed})`:'';
   const rareTag = s.rarity==='legend'?' #激レア称号' : s.rarity==='rare'?' #レア称号':'';
   const extra = s.delta>1 ? '#若見え' : s.overall>=85 ? '#すこやか自慢' : (s.species==='cat'?'#猫のいる暮らし':'#犬のいる暮らし');
   const tmpls=[
-    `うちの子${b}、健康年齢${s.healthAge}歳でした✨ 実年齢より${s.deltaShort}、称号は「${s.title}」🏅`,            // 自慢系
-    `AIにうちの子${b}を診てもらったら健康年齢${s.healthAge}歳😳 称号「${s.title}」もらった（${s.deltaShort}だって）`, // ツッコミ系
-    `今日もこの子${b}が元気でなにより🐾 健康年齢${s.healthAge}歳、「${s.title}」をいただきました。ずっと健康でいてね`,   // エモ系
-    `「${s.title}」獲得✌️ うちの子${b}の健康年齢は${s.healthAge}歳（${s.deltaShort}）でした`,                       // 自慢系2
-    `うちの子${b}を診断したら「${s.title}」だった☺️ 健康年齢${s.healthAge}歳、これからも大切にするね🐾`,             // エモ系2
+    `${nm}${b}、健康年齢${s.healthAge}歳でした✨ 実年齢より${s.deltaShort}、称号は「${s.title}」🏅`,            // 自慢系
+    `AIに${nm}${b}を診てもらったら健康年齢${s.healthAge}歳😳 称号「${s.title}」もらった（${s.deltaShort}だって）`, // ツッコミ系
+    `今日も${nm}${b}が元気でなにより🐾 健康年齢${s.healthAge}歳、「${s.title}」をいただきました。ずっと健康でいてね`,   // エモ系
+    `「${s.title}」獲得✌️ ${nm}${b}の健康年齢は${s.healthAge}歳（${s.deltaShort}）でした`,                       // 自慢系2
+    `${nm}${b}を診断したら「${s.title}」だった☺️ 健康年齢${s.healthAge}歳、これからも大切にするね🐾`,             // エモ系2
   ];
   const t=tmpls[Math.floor(Math.random()*tmpls.length)];
   return `${t}\n#MOFURI #うちの子健康診断 ${extra}${rareTag}`;
